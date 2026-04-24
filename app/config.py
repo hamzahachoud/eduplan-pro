@@ -1,7 +1,9 @@
 import os
 
 basedir = os.path.abspath(os.path.dirname(__file__))
-instance_dir = os.path.abspath(os.path.join(basedir, '..', 'instance'))
+project_root = os.path.abspath(os.path.join(basedir, '..'))
+instance_dir = os.path.join(project_root, 'instance')
+
 os.makedirs(instance_dir, exist_ok=True)
 
 class Config:
