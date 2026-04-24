@@ -2,6 +2,7 @@ import os
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 instance_dir = os.path.abspath(os.path.join(basedir, '..', 'instance'))
+os.makedirs(instance_dir, exist_ok=True)
 
 class Config:
     # Clé secrète de l'application - essentiel pour la sécurité (sessions, CSRF)
