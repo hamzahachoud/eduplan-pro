@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row align-items-center mb-4">
+    <div class="col-md-8">
+        <h2 class="fw-bold m-0"><i class="fas fa-calendar-week me-2 text-primary"></i> Mon Planning : {{ current_user.formation.nom if current_user.formation else '' }}</h2>
+        <div class="mt-2">
+            <span class="badge bg-primary bg-opacity-10 text-primary border border-primary border-opacity-25 px-3 py-2">
+                <i class="fas fa-users me-1"></i> {{ current_user.td_group }}
+            </span>
+            <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 px-3 py-2 ms-2">
+                <i class="fas fa-flask me-1"></i> {{ current_user.tp_group }}
+            </span>
+        </div>
+    </div>
+    <div class="col-md-4 text-md-end mt-3 mt-md-0 no-print">
+        <button onclick="window.print()" class="btn btn-outline-light">
+            <i class="fas fa-print me-2"></i>Imprimer
+        </button>
+        <a href="{{ url_for('student.dashboard') }}" class="btn btn-primary ms-2 shadow-sm">
+            <i class="fas fa-cog me-1"></i> Changer mes groupes
+        </a>
+    </div>
+</div>
+
+<div class="glass-card mb-4 min-vh-75">
+    {% for d in dates %}
+    <div class="mb-5 last-child-mb-0">
+        <h5 class="text-primary fw-bold mb-4 border-bottom border-primary border-opacity-25 pb-2">
+            <i class="fas fa-calendar-day me-2"></i> {{ d.strftime('%A %d %B %Y') }}
+        </h5>
+        
+        <div class="row g-3">
+            {% for t in creneaux %}
+                {% if grid_data[d] and grid_data[d][t] %}
+                    {% set s = grid_data[d][t] %}
+                    <div class="col-md-3">
+                        <div class="glass-card p-3 h-100 border-opacity-50 position-relative animate-fade-in
+                            {% if s.type_seance == 'CM' %}bg-primary bg-opacity-20 border-primary
+                            {% elif s.type_seance == 'TD' %}bg-success bg-opacity-20 border-success
+                            {% else %}bg-warning bg-opacity-20 border-warning{% endif %}">
+                            
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="badge {% if s.type_seance == 'CM' %}bg-primary{% elif s.type_seance == 'TD' %}bg-success{% else %}bg-warning text-dark{% endif %}">
+                                    {{ s.type_seance }}
+                                </span>
+                                <span class="small fw-bold"><i class="far fa-clock me-1"></i>{{ s.heure_debut.strftime('%H:%M') }} - {{ s.heure_fin.strftime('%H:%M') }}</span>
+                            </div>
+                            
+                            <h6 class="fw-bold mb-1">{{ s.module.code }}</h6>
+                            <div class="small mb-2 text-muted">{{ s.module.libelle }}</div>
+                            <hr class="my-2 border-white border-opacity-10">
+                            
+                            <div class="small d-flex align-items-center">
+                                <i class="fas fa-user-tie me-2 opacity-50"></i>
+                                <span>{{ s.enseignant.nom_complet() if s.enseignant else 'N/A' }}</span>
+                            </div>
+                            <div class="small mt-1 d-flex align-items-center">
+                                <i class="fas fa-users me-2 opacity-50"></i>
+                                <span class="fw-bold me-3">{{ s.groupe }}</span>
+                                <i class="fas fa-door-open me-2 opacity-50 ms-auto"></i>
+                                <span class="fw-bold">{{ s.salle.nom if s.salle else 'N/A' }}</span>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+    {% else %}
+    <div class="text-center py-5 text-muted">
+        <i class="fas fa-calendar-times fa-4x mb-4 opacity-25"></i>
+        <h4 class="fw-bold">Aucune séance à afficher</h4>
+        <p>Revenez plus tard pour consulter les mises à jour de votre emploi du temps.</p>
+    </div>
+    {% endfor %}
+</div>
+
+<style>
+.last-child-mb-0:last-child { margin-bottom: 0 !important; }
+@media print {
+    body { background: white !important; color: black !important; }
+    .navbar, .btn, .no-print, .btn-secondary { display: none !important; }
+    .glass-card { 
+        background: white !important; 
+        border: 1px solid #ddd !important; 
+        box-shadow: none !important; 
+        backdrop-filter: none !important;
+        color: black !important;
+    }
+    .text-primary { color: #000 !important; }
+    .badge { border: 1px solid #000 !important; background: transparent !important; color: #000 !important; }
+}
+</style>
+{% endblock %}

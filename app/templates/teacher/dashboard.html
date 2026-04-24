@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12 mb-4">
+        <h2 class="fw-bold">Espace Enseignant : {{ current_user.enseignant.nom_complet() }}</h2>
+        <p class="text-muted">Consultez votre emploi du temps et gérez vos séances.</p>
+    </div>
+    
+    <div class="col-lg-4 mb-4">
+        <div class="glass-card animate-fade-in h-100">
+            <div class="text-center py-4">
+                <i class="fas fa-calendar-alt fa-4x text-primary mb-3"></i>
+                <h3 class="fw-bold">{{ seances_futures }}</h3>
+                <p class="text-muted">Séances à venir</p>
+                <a href="{{ url_for('teacher.planning') }}" class="btn btn-primary w-100 mt-3">
+                    <i class="fas fa-eye me-2"></i>Voir mon planning
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-8">
+        <div class="glass-card animate-fade-in" style="animation-delay: 0.2s;">
+            <h5 class="fw-bold mb-4"><i class="fas fa-info-circle me-2"></i>Informations</h5>
+            <div class="alert alert-info bg-opacity-10 border-info text-white">
+                <i class="fas fa-lightbulb me-2"></i>
+                Bienvenue dans votre nouvel espace dédié. Vous pouvez voir ici toutes les séances qui vous ont été attribuées par l'administration.
+            </div>
+            <p>Votre profil est lié à : <strong>{{ current_user.enseignant.nom_complet() }}</strong></p>
+            <p>Email : <code>{{ current_user.email }}</code></p>
+        </div>
+    </div>
+</div>
+{% endblock %}

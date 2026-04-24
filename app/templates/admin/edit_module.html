@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-6">
+        <div class="glass-card animate-fade-in">
+            <div class="d-flex align-items-center mb-4">
+                <a href="{{ url_for('admin.modules') }}" class="btn btn-sm btn-outline-secondary me-3">
+                    <i class="fas fa-arrow-left"></i>
+                </a>
+                <div>
+                    <h4 class="fw-bold mb-0"><i class="fas fa-edit me-2"></i>Modifier le module</h4>
+                    <p class="text-muted small mb-0">{{ module.code }} – {{ module.libelle }}</p>
+                </div>
+            </div>
+            
+            <form method="POST" action="{{ url_for('admin.edit_module', id=module.id) }}">
+                <div class="mb-4">
+                    <label class="form-label fw-semibold">Catégorie</label>
+                    <select name="categorie" class="form-select">
+                        <option value="">-- Aucune catégorie --</option>
+                        {% for cat in categories %}
+                        <option value="{{ cat }}" {% if module.categorie and module.categorie.lower() == cat.lower() %}selected{% endif %}>
+                            {{ cat | capitalize }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                    <small class="text-muted">Détermine les salles de TP compatibles</small>
+                </div>
+                
+                <hr style="border-color: rgba(255,255,255,0.1)">
+                
+                <label class="form-label fw-semibold mb-3">Volume horaire (en heures)</label>
+                <div class="row g-3 mb-4">
+                    <div class="col-4">
+                        <label class="form-label text-muted small">h CM</label>
+                        <input type="number" name="cm_heures" class="form-control text-center fw-bold" 
+                               step="0.5" min="0" value="{{ module.cm_heures }}">
+                    </div>
+                    <div class="col-4">
+                        <label class="form-label text-muted small">h TD / groupe</label>
+                        <input type="number" name="td_heures" class="form-control text-center fw-bold" 
+                               step="0.5" min="0" value="{{ module.td_heures }}">
+                    </div>
+                    <div class="col-4">
+                        <label class="form-label text-muted small">h TP / groupe</label>
+                        <input type="number" name="tp_heures" class="form-control text-center fw-bold" 
+                               step="0.5" min="0" value="{{ module.tp_heures }}">
+                    </div>
+                </div>
+
+                <div class="d-flex gap-3">
+                    <a href="{{ url_for('admin.modules') }}" class="btn btn-outline-secondary flex-fill">Annuler</a>
+                    <button type="submit" class="btn btn-primary flex-fill">
+                        <i class="fas fa-save me-2"></i>Enregistrer
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

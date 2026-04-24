@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-4 mb-4">
+        <div class="glass-card animate-fade-in">
+            <h5 class="fw-bold mb-4"><i class="fas fa-book-medical me-2"></i> Ajouter au Programme</h5>
+            <form method="POST" action="">
+                {{ form.hidden_tag() }}
+                <div class="mb-3">
+                    <label class="form-label text-muted small">Code Module</label>
+                    {{ form.code(class="form-control", placeholder="ex: M2103") }}
+                </div>
+                <div class="mb-3">
+                    <label class="form-label text-muted small">Libellé</label>
+                    {{ form.libelle(class="form-control", placeholder="ex: Bases de données") }}
+                </div>
+                <div class="mb-3">
+                    <label class="form-label text-muted small">Catégorie (ex: Info, Anglais)</label>
+                    {{ form.categorie(class="form-control") }}
+                </div>
+                <div class="mb-3">
+                    <label class="form-label text-muted small">Formation</label>
+                    {{ form.formation_id(class="form-select") }}
+                </div>
+                <div class="row">
+                    <div class="col-4 mb-3">
+                        <label class="form-label text-muted small">h CM</label>
+                        {{ form.cm_heures(class="form-control") }}
+                    </div>
+                    <div class="col-4 mb-3">
+                        <label class="form-label text-muted small">h TD/gp</label>
+                        {{ form.td_heures(class="form-control") }}
+                    </div>
+                    <div class="col-4 mb-3">
+                        <label class="form-label text-muted small">h TP/gp</label>
+                        {{ form.tp_heures(class="form-control") }}
+                    </div>
+                </div>
+                {{ form.submit(class="btn btn-primary w-100 mt-3") }}
+            </form>
+        </div>
+    </div>
+    
+    <div class="col-lg-8">
+        <div class="glass-card animate-fade-in" style="animation-delay: 0.2s;">
+            <h5 class="fw-bold mb-4"><i class="fas fa-stream me-2"></i> Maquette Pédagogique</h5>
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Module</th>
+                            <th>Formation</th>
+                            <th>CM</th>
+                            <th>TD</th>
+                            <th>TP</th>
+                            <th>Catégorie</th>
+                            <th>Total</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for module in modules %}
+                        <tr>
+                            <td>
+                                <div class="fw-bold">{{ module.code }}</div>
+                                <div class="small text-muted">{{ module.libelle }}</div>
+                            </td>
+                            <td><span class="badge bg-secondary">{{ module.formation.nom }}</span></td>
+                            <td><span class="badge badge-custom badge-cm">{{ module.cm_heures }}h</span></td>
+                            <td><span class="badge badge-custom badge-td">{{ module.td_heures }}h</span></td>
+                            <td><span class="badge badge-custom badge-tp">{{ module.tp_heures }}h</span></td>
+                            <td>{{ module.categorie or '-' }}</td>
+                            <td class="fw-bold">{{ module.volume_total }}h</td>
+                            <td>
+                                <div class="d-flex gap-2">
+                                    <a href="{{ url_for('admin.edit_module', id=module.id) }}" class="btn btn-sm btn-outline-info" title="Modifier">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <a href="{{ url_for('admin.delete_module', id=module.id) }}" class="btn btn-sm btn-outline-danger" title="Supprimer" onclick="return confirm('Supprimer ce module ?');">
+                                        <i class="fas fa-trash"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="6" class="text-center text-muted">Aucun module configuré.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

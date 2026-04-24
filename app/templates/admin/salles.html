@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-4 mb-4">
+        <div class="glass-card animate-fade-in">
+            <h5 class="fw-bold mb-4"><i class="fas fa-plus-circle me-2"></i> Nouvelle Salle</h5>
+            <form method="POST" action="">
+                {{ form.hidden_tag() }}
+                <div class="mb-3">
+                    <label class="form-label text-muted small">Type de salle</label>
+                    {{ form.type_salle(class="form-select", id="type_salle_select") }}
+                </div>
+                <div id="nom_field" class="mb-3">
+                    <label class="form-label text-muted small">Nom de la salle (Amphi)</label>
+                    {{ form.nom(class="form-control", placeholder="ex: Amphi A") }}
+                </div>
+                <div id="bulk_fields" style="display: none;">
+                    <div class="mb-3">
+                        <label class="form-label text-muted small">Nombre de salles</label>
+                        {{ form.nombre(class="form-control") }}
+                    </div>
+                    <div id="cat_field" class="mb-3" style="display: none;">
+                        <label class="form-label text-muted small">Catégorie (ex: Info, Anglais)</label>
+                        {{ form.categorie(class="form-control") }}
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label text-muted small">Capacité par salle</label>
+                    {{ form.capacite(class="form-control") }}
+                </div>
+                {{ form.submit(class="btn btn-primary w-100 mt-3") }}
+            </form>
+        </div>
+    </div>
+    
+    <div class="col-lg-8">
+        <div class="glass-card animate-fade-in" style="animation-delay: 0.2s;">
+            <h5 class="fw-bold mb-4"><i class="fas fa-door-open me-2"></i> Salles Existantes</h5>
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Nom</th>
+                            <th>Type</th>
+                            <th>Catégorie</th>
+                            <th>Capacité</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for salle in salles %}
+                        <tr>
+                            <td class="fw-bold text-primary">{{ salle.nom }}</td>
+                            <td>
+                                <span class="badge {% if salle.type_salle == 'Amphi' %}bg-info{% elif salle.type_salle == 'TD' %}bg-success{% else %}bg-warning{% endif %}">
+                                    {{ salle.type_salle }}
+                                </span>
+                            </td>
+                            <td>{{ salle.categorie or '-' }}</td>
+                            <td>{{ salle.capacite or 'N/A' }}</td>
+                            <td>
+                                <a href="{{ url_for('admin.delete_salle', id=salle.id) }}" class="btn btn-sm btn-outline-danger" onclick="return confirm('Supprimer cette salle ?')">
+                                    <i class="fas fa-trash"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="5" class="text-center text-muted">Aucune salle créée.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const typeSelect = document.getElementById('type_salle_select');
+    const nomField = document.getElementById('nom_field');
+    const bulkFields = document.getElementById('bulk_fields');
+    const catField = document.getElementById('cat_field');
+
+    function toggleFields() {
+        const val = typeSelect.value;
+        if (val === 'Amphi') {
+            nomField.style.display = 'block';
+            bulkFields.style.display = 'none';
+        } else {
+            nomField.style.display = 'none';
+            bulkFields.style.display = 'block';
+            if (val === 'TP') {
+                catField.style.display = 'block';
+            } else {
+                catField.style.display = 'none';
+            }
+        }
+    }
+
+    typeSelect.addEventListener('change', toggleFields);
+    toggleFields();
+});
+</script>
+{% endblock %}

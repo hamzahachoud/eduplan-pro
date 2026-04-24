@@ -1,0 +1,140 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+    <!-- Ajouter un Enseignant -->
+    <div class="col-lg-4 mb-4">
+        <div class="glass-card mb-4 animate-fade-in">
+            <h5 class="fw-bold mb-4"><i class="fas fa-user-plus me-2"></i> Nouvel Intervenant</h5>
+            <form method="POST" action="">
+                {{ form_enseignant.hidden_tag() }}
+                <div class="mb-3">
+                    <label class="form-label text-muted small">Nom</label>
+                    {{ form_enseignant.nom(class="form-control") }}
+                </div>
+                <div class="mb-3">
+                    <label class="form-label text-muted small">Prénom</label>
+                    {{ form_enseignant.prenom(class="form-control") }}
+                </div>
+                <input type="submit" name="submit_enseignant" value="Ajouter l'enseignant" class="btn btn-primary w-100 mt-2">
+            </form>
+        </div>
+
+        <!-- Affecter des heures -->
+        <div class="glass-card animate-fade-in" style="animation-delay: 0.1s;">
+            <h5 class="fw-bold mb-4"><i class="fas fa-link me-2"></i> Affectation d'heures</h5>
+            <form method="POST" action="">
+                {{ form_affectation.hidden_tag() }}
+                <div class="mb-3">
+                    <label class="form-label text-muted small">Sélectionner l'Enseignant</label>
+                    {{ form_affectation.enseignant_id(class="form-select") }}
+                </div>
+                <div class="mb-3">
+                    <label class="form-label text-muted small">Sélectionner le Module</label>
+                    {{ form_affectation.module_id(class="form-select") }}
+                </div>
+                <div class="row">
+                    <div class="col-4 mb-3">
+                        <label class="form-label text-muted small">h CM</label>
+                        {{ form_affectation.cm_heures(class="form-control") }}
+                    </div>
+                    <div class="col-4 mb-3">
+                        <label class="form-label text-muted small">h TD</label>
+                        {{ form_affectation.td_heures(class="form-control") }}
+                    </div>
+                    <div class="col-4 mb-3">
+                        <label class="form-label text-muted small">h TP</label>
+                        {{ form_affectation.tp_heures(class="form-control") }}
+                    </div>
+                </div>
+                <input type="submit" name="submit_affectation" value="Valider l'affectation" class="btn btn-primary w-100 mt-2">
+            </form>
+        </div>
+    </div>
+    
+    <!-- Liste des Affectations -->
+    <div class="col-lg-8">
+        <div class="glass-card animate-fade-in" style="animation-delay: 0.2s;">
+            <h5 class="fw-bold mb-4"><i class="fas fa-user-check me-2"></i> Répartition des enseignements</h5>
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Enseignant</th>
+                            <th>Module</th>
+                            <th>H. Affectées</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for aff in affectations %}
+                        <tr>
+                            <td class="fw-bold">{{ aff.enseignant.nom_complet() }}</td>
+                            <td>{{ aff.module.code }}</td>
+                            <td>
+                                <span class="badge badge-custom badge-cm">{{ aff.cm_heures }}h CM</span>
+                                <span class="badge badge-custom badge-td">{{ aff.td_heures }}h TD</span>
+                                <span class="badge badge-custom badge-tp">{{ aff.tp_heures }}h TP</span>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="3" class="text-center text-muted">Aucune affectation enregistrée.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            </div>
+        </div>
+
+        <!-- DASHBOARD DE CHARGE (NOUVEAU) -->
+        <div class="glass-card mt-4 animate-fade-in" style="animation-delay: 0.3s;">
+            <h5 class="fw-bold mb-4 text-warning"><i class="fas fa-chart-line me-2"></i> Suivi de la Charge de Travail</h5>
+            <div class="table-responsive">
+                <table class="table align-middle">
+                    <thead>
+                        <tr>
+                            <th>Intervenant</th>
+                            <th>Charge Totale</th>
+                            <th style="width: 200px;">Progression Planning</th>
+                            <th>Restant</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for sp in stats_profs %}
+                        <tr>
+                            <td>
+                                <div class="fw-bold">{{ sp.enseignant.nom_complet() }}</div>
+                            </td>
+                            <td><span class="badge bg-dark">{{ sp.total_affecte }}h</span></td>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="progress progress-custom flex-grow-1 me-2" style="background: rgba(255,255,255,0.05);">
+                                        <div class="progress-bar {% if sp.h_sup > 0 %}bg-danger{% else %}bg-success{% endif %}" role="progressbar" 
+                                             style="width: {% if sp.percent > 100 %}100{% else %}{{ sp.percent }}{% endif %}%;" 
+                                             aria-valuenow="{{ sp.percent }}" aria-valuemin="0" aria-valuemax="100"></div>
+                                    </div>
+                                    <span class="x-small {% if sp.h_sup > 0 %}text-danger fw-bold{% endif %}">{{ sp.percent }}%</span>
+                                </div>
+                                <div class="x-small text-muted mt-1">{{ sp.total_planifie }}h planifiées</div>
+                            </td>
+                            <td>
+                                {% if sp.h_sup > 0 %}
+                                    <span class="badge bg-danger text-white animate-pulse">
+                                        +{{ sp.h_sup }}h suppl.
+                                    </span>
+                                {% else %}
+                                    <div class="text-success fw-bold">
+                                        {{ sp.reste }}h
+                                    </div>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

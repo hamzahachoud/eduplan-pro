@@ -1,0 +1,386 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+    <!-- Formulaire de Planification -->
+    <div class="col-lg-4 mb-4">
+        <div class="glass-card animate-fade-in">
+            <h5 class="fw-bold mb-4"><i class="fas fa-calendar-alt me-2"></i> Programmation</h5>
+            <form method="POST" action="">
+                {{ form.hidden_tag() }}
+                <div class="mb-3">
+                    <label class="form-label text-muted small">Module</label>
+                    {{ form.module_id(class="form-select") }}
+                </div>
+                <div class="mb-3">
+                    <label class="form-label text-muted small">Type de séance</label>
+                    {{ form.type_seance(class="form-select") }}
+                </div>
+                <div class="mb-3">
+                    <label class="form-label text-muted small">Enseignant</label>
+                    {{ form.enseignant_id(class="form-select") }}
+                </div>
+                <div class="mb-3">
+                    <label class="form-label text-muted small">Salle</label>
+                    {{ form.salle_id(class="form-select") }}
+                </div>
+                <div class="mb-3">
+                    <label class="form-label text-muted small">Groupe</label>
+                    <select name="groupe" class="form-select">
+                        {% for g_name in groupes_form %}
+                            <option value="{{ g_name }}">{{ g_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="row">
+                    <div class="col-6 mb-3">
+                        <label class="form-label text-muted small">Date</label>
+                        {{ form.date_seance(class="form-control", type="date") }}
+                    </div>
+                    <div class="col-6 mb-3">
+                        <label class="form-label text-muted small">Début</label>
+                        {{ form.heure_debut(class="form-control", type="time") }}
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label text-muted small">Durée (h)</label>
+                    {{ form.duree(class="form-control") }}
+                </div>
+                {{ form.submit(class="btn btn-primary w-100 mt-2") }}
+            </form>
+        </div>
+    </div>
+    
+    <!-- Grille de Planning -->
+    <div class="col-lg-8">
+        <div class="glass-card animate-fade-in" style="animation-delay: 0.2s;">
+            <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
+                <div class="d-flex align-items-center">
+                    <h5 class="fw-bold m-0 me-3"><i class="fas fa-calendar-week me-2"></i> {{ current_formation.nom }}</h5>
+                    <div class="dropdown no-print">
+                        <button class="btn btn-sm btn-outline-light dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                            Changer de formation
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-dark">
+                            {% for f in formations %}
+                            <li><a class="dropdown-content dropdown-item {% if f.id == current_formation.id %}active{% endif %}" 
+                                   href="{{ url_for('admin.planning', fid=f.id) }}">
+                                {{ f.nom }}
+                            </a></li>
+                            {% endfor %}
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item small" href="{{ url_for('admin.formations') }}">Gérer les formations</a></li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <form action="{{ url_for('admin.generate_planning', fid=current_formation.id) }}" method="POST" onsubmit="return confirm('Générer automatiquement toutes les séances manquantes ?');">
+                    <button type="submit" class="btn btn-sm btn-outline-warning">
+                        <i class="fas fa-magic me-1"></i> Générer Auto
+                    </button>
+                </form>
+            </div>
+
+            {% for d in dates %}
+            <div class="mb-5 last-child-mb-0">
+                <h6 class="text-primary fw-bold mb-3 border-bottom border-primary border-opacity-25 pb-2">
+                    <i class="fas fa-calendar-day me-2"></i> {{ d.strftime('%A %d %B %Y') }}
+                </h6>
+                <div class="table-responsive">
+                    <table class="table table-bordered border-white border-opacity-10 text-center align-middle" style="table-layout: fixed;">
+                        <thead class="bg-white bg-opacity-5">
+                            <tr>
+                                <th style="width: 80px;">Heure</th>
+                                {% for g in groupes %}
+                                    <th class="small">{{ g }}</th>
+                                {% endfor %}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for t in creneaux %}
+                                {% if grid_data[d] and grid_data[d][t] %}
+                                <tr>
+                                    <td class="small fw-bold text-muted bg-white bg-opacity-5">{{ t.strftime('%H:%M') }}</td>
+                                    
+                                    {# Gestion spéciale pour le CM qui occupe toute la ligne #}
+                                    {% if grid_data[d][t]['CM'] %}
+                                        <td colspan="{{ groupes|length }}" class="p-1">
+                                            {% set s = grid_data[d][t]['CM'] %}
+                                            <div class="glass-card p-2 bg-primary bg-opacity-40 border-primary position-relative h-100">
+                                                
+                                                {# SWAP MODULE #}
+                                                <form action="{{ url_for('admin.update_seance_module') }}" method="POST" class="no-print mb-1">
+                                                    <input type="hidden" name="seance_id" value="{{ s.id }}">
+                                                    <select name="module_id" class="form-select form-select-mini bg-dark text-white border-0 planning-text" onchange="this.form.submit()">
+                                                        {% for mod in modules %}
+                                                        <option value="{{ mod.id }}" {% if s.module_id == mod.id %}selected{% endif %}>
+                                                            {{ mod.code }}
+                                                        </option>
+                                                        {% endfor %}
+                                                    </select>
+                                                </form>
+
+                                                {# SWAP PROF (FILTRÉ) #}
+                                                <form action="{{ url_for('admin.update_seance_enseignant') }}" method="POST" class="no-print mb-1">
+                                                    <input type="hidden" name="seance_id" value="{{ s.id }}">
+                                                    <select name="enseignant_id" class="form-select form-select-mini bg-dark bg-opacity-50 text-white border-0" onchange="this.form.submit()">
+                                                        <option value="">Aucun</option>
+                                                        {% for ens in enseignants %}
+                                                            {% if ens.id in allowed_instructors[s.module_id] %}
+                                                            <option value="{{ ens.id }}" {% if s.enseignant_id == ens.id %}selected{% endif %}>
+                                                                {{ ens.nom }}
+                                                            </option>
+                                                            {% endif %}
+                                                        {% endfor %}
+                                                    </select>
+                                                </form>
+
+                                                {# SWAP SALLE #}
+                                                <form action="{{ url_for('admin.update_seance_salle') }}" method="POST" class="no-print">
+                                                    <input type="hidden" name="seance_id" value="{{ s.id }}">
+                                                    <select name="salle_id" class="form-select form-select-mini bg-dark bg-opacity-50 text-white border-0" onchange="this.form.submit()">
+                                                        <option value="">Salle ?</option>
+                                                        {% for sl in salles %}
+                                                            {# Pour CM : Seulement Amphi #}
+                                                            {% if sl.type_salle == 'Amphi' %}
+                                                                <option value="{{ sl.id }}" {% if s.salle_id == sl.id %}selected{% endif %}>
+                                                                    {{ sl.nom }}
+                                                                </option>
+                                                            {% endif %}
+                                                        {% endfor %}
+                                                    </select>
+                                                </form>
+
+                                                <div class="x-small text-white-50 mt-1">
+                                                    <i class="far fa-clock me-1"></i> {{ s.heure_debut.strftime('%H:%M') }} - {{ s.heure_fin.strftime('%H:%M') }}
+                                                </div>
+
+                                                <a href="{{ url_for('admin.delete_seance', id=s.id) }}" class="btn-delete-mini">
+                                                    <i class="fas fa-times"></i>
+                                                </a>
+                                            </div>
+                                        </td>
+                                    {% else %}
+                                        {# Affichage des colonnes par groupe pour les TD/TP #}
+                                        {% for g in groupes %}
+                                            <td class="p-1" style="min-height: 120px;">
+                                                {% if grid_data[d][t][g] %}
+                                                    {% set s = grid_data[d][t][g] %}
+                                                    <div class="glass-card p-2 border-opacity-50 h-100 position-relative 
+                                                        {% if s.type_seance == 'TD' %}bg-success bg-opacity-40 border-success{% else %}bg-warning bg-opacity-40 border-warning{% endif %}">
+                                                        
+                                                        {# SWAP MODULE #}
+                                                        <form action="{{ url_for('admin.update_seance_module') }}" method="POST" class="no-print mb-1">
+                                                            <input type="hidden" name="seance_id" value="{{ s.id }}">
+                                                            <select name="module_id" class="form-select form-select-mini bg-dark text-white border-0 planning-text" onchange="this.form.submit()">
+                                                                {% for mod in modules %}
+                                                                <option value="{{ mod.id }}" {% if s.module_id == mod.id %}selected{% endif %}>
+                                                                    {{ mod.code }}
+                                                                </option>
+                                                                {% endfor %}
+                                                            </select>
+                                                        </form>
+
+                                                        <div class="x-small text-white-50 mb-1">
+                                                            <i class="far fa-clock me-1"></i> {{ s.heure_debut.strftime('%H:%M') }} - {{ s.heure_fin.strftime('%H:%M') }}
+                                                        </div>
+                                                        
+                                                        {# SWAP PROF (FILTRÉ) #}
+                                                        <form action="{{ url_for('admin.update_seance_enseignant') }}" method="POST" class="no-print mb-1">
+                                                            <input type="hidden" name="seance_id" value="{{ s.id }}">
+                                                            <select name="enseignant_id" class="form-select form-select-mini bg-dark bg-opacity-50 text-white border-0" onchange="this.form.submit()">
+                                                                <option value="">Aucun</option>
+                                                                {% for ens in enseignants %}
+                                                                    {% if ens.id in allowed_instructors[s.module_id] %}
+                                                                    <option value="{{ ens.id }}" {% if s.enseignant_id == ens.id %}selected{% endif %}>
+                                                                        {{ ens.nom }}
+                                                                    </option>
+                                                                    {% endif %}
+                                                                {% endfor %}
+                                                            </select>
+                                                        </form>
+
+                                                        {# SWAP SALLE #}
+                                                        <form action="{{ url_for('admin.update_seance_salle') }}" method="POST" class="no-print">
+                                                            <input type="hidden" name="seance_id" value="{{ s.id }}">
+                                                            <select name="salle_id" class="form-select form-select-mini bg-dark bg-opacity-50 text-white border-0" onchange="this.form.submit()">
+                                                                <option value="">Salle ?</option>
+                                                                {% for sl in salles %}
+                                                                    {% set show_salle = false %}
+                                                                    {# TD -> Salles TD #}
+                                                                    {% if s.type_seance == 'TD' and sl.type_salle == 'TD' %}
+                                                                        {% set show_salle = true %}
+                                                                    {# TP -> Salles TP + Filtre catégorie strict #}
+                                                                    {% elif s.type_seance == 'TP' and sl.type_salle == 'TP' %}
+                                                                        {% if s.module.categorie %}
+                                                                            {% set mod_cat = s.module.categorie.lower().strip() %}
+                                                                            {% set room_cat = sl.categorie.lower().strip() if sl.categorie else "" %}
+                                                                            
+                                                                            {# Mapping Info #}
+                                                                            {% set is_info_module = mod_cat in ['python', 'linux', 'programation', 'bdd', 'info'] %}
+                                                                            
+                                                                            {% if is_info_module and room_cat == 'info' %}
+                                                                                {% set show_salle = true %}
+                                                                            {% elif room_cat == mod_cat %}
+                                                                                {% set show_salle = true %}
+                                                                            {% endif %}
+                                                                        {% else %}
+                                                                            {% set show_salle = true %}
+                                                                        {% endif %}
+                                                                    {% endif %}
+
+                                                                    {% if show_salle %}
+                                                                        <option value="{{ sl.id }}" {% if s.salle_id == sl.id %}selected{% endif %}>
+                                                                            {{ sl.nom }}
+                                                                        </option>
+                                                                    {% endif %}
+                                                                {% endfor %}
+                                                            </select>
+                                                        </form>
+
+                                                        <a href="{{ url_for('admin.delete_seance', id=s.id) }}" class="btn-delete-mini">
+                                                            <i class="fas fa-times"></i>
+                                                        </a>
+                                                    </div>
+                                                {% endif %}
+                                            </td>
+                                        {% endfor %}
+                                    {% endif %}
+                                </tr>
+                                {% endif %}
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            {% else %}
+                <div class="text-center py-5 text-muted">
+                    <i class="fas fa-calendar-times fa-3x mb-3"></i>
+                    <p>Aucune séance planifiée. Utilisez le formulaire ou la génération automatique.</p>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<style>
+.x-small { font-size: 0.7rem; }
+.btn-delete-mini {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    color: rgba(255,255,255,0.4);
+    font-size: 0.7rem;
+    padding: 0 4px;
+}
+.btn-delete-mini:hover { color: #ff4b2b; }
+.last-child-mb-0:last-child { margin-bottom: 0 !important; }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const moduleSelect = document.getElementById('module_id');
+    const teacherSelect = document.getElementById('enseignant_id');
+    const typeSelect = document.getElementById('type_seance');
+    const salleSelect = document.getElementById('salle_id');
+    
+    const allowedInstructors = {{ allowed_instructors|tojson }};
+    const modulesData = {{ modules_data|tojson }};
+    const sallesData = {{ salles_data|tojson }};
+    
+    // Garder une copie de toutes les salles pour pouvoir les filtrer
+    const allSalles = Array.from(salleSelect.options).map(opt => ({
+        value: opt.value,
+        text: opt.text
+    }));
+
+    function filterSalles() {
+        if (!salleSelect) return;
+        
+        const moduleId = moduleSelect.value;
+        const typeSeance = typeSelect.value;
+        const moduleCat = (modulesData[moduleId] && modulesData[moduleId].categorie) ? modulesData[moduleId].categorie.toLowerCase().trim() : null;
+        
+        const currentValue = salleSelect.value;
+        
+        // Vider le select
+        salleSelect.innerHTML = '';
+        
+        // Liste des catégories Info (Mapping)
+        const infoAliases = ['python', 'linux', 'programation', 'bdd', 'info', 'logiciel'];
+
+        allSalles.forEach(s => {
+            if (s.value === "") {
+                const opt = new Option(s.text, s.value);
+                salleSelect.add(opt);
+                return;
+            }
+            
+            const info = sallesData[s.value];
+            if (!info) return;
+
+            let show = false;
+            const rCat = info.categorie ? info.categorie.toLowerCase().trim() : "";
+
+            if (typeSeance === 'CM') {
+                if (info.type === 'Amphi') show = true;
+            } else if (typeSeance === 'TD') {
+                if (info.type === 'TD') show = true;
+            } else if (typeSeance === 'TP') {
+                if (info.type === 'TP') {
+                    if (moduleCat) {
+                        const isInfoModule = infoAliases.includes(moduleCat);
+                        if (isInfoModule && rCat === 'info') {
+                            show = true;
+                        } else if (rCat === moduleCat) {
+                            show = true;
+                        }
+                    } else {
+                        show = true; 
+                    }
+                }
+            }
+
+            if (show) {
+                const opt = new Option(s.text, s.value);
+                if (s.value === currentValue) opt.selected = true;
+                salleSelect.add(opt);
+            }
+        });
+    }
+
+    function filterTeachers() {
+        if (!teacherSelect || !moduleSelect) return;
+        const moduleId = moduleSelect.value;
+        const allowedIds = allowedInstructors[moduleId] || [];
+        const currentValue = teacherSelect.value;
+
+        Array.from(teacherSelect.options).forEach(option => {
+            if (option.value === "" || allowedIds.includes(parseInt(option.value))) {
+                option.hidden = false;
+                option.disabled = false;
+                option.style.display = 'block';
+            } else {
+                option.hidden = true;
+                option.disabled = true;
+                option.style.display = 'none';
+                if (option.value === currentValue) {
+                    teacherSelect.value = "";
+                }
+            }
+        });
+    }
+
+    if (moduleSelect) {
+        moduleSelect.addEventListener('change', () => { filterTeachers(); filterSalles(); });
+    }
+    if (typeSelect) {
+        typeSelect.addEventListener('change', filterSalles);
+    }
+    
+    // Filtre initial
+    filterTeachers();
+    filterSalles();
+});
+</script>
+{% endblock %}
