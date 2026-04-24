@@ -10,19 +10,51 @@ admin_bp = Blueprint('admin', __name__)
 
 from app.extensions import db
 from app.models import User
-
 @admin_bp.route('/init-db')
 def init_db_route():
+    from app.extensions import db
+    from app.models import User, Formation, Module
+
     db.create_all()
 
-    existing_admin = User.query.filter_by(email="admin@test.com").first()
-    if not existing_admin:
-        admin = User(email="admin@univ.fr", role="admin")
-        admin.set_password("admin123")
+    admin = User.query.filter_by(email='admin@univ.fr').first()
+    if not admin:
+        admin = User(email='admin@univ.fr', role='admin')
         db.session.add(admin)
-        db.session.commit()
 
-    return "Base de données initialisée !"
+    admin.role = 'admin'
+    admin.set_password('admin123')
+
+    student = User.query.filter_by(email='test@student.fr').first()
+    if not student:
+        student = User(email='test@student.fr', role='student')
+        db.session.add(student)
+
+    student.set_password('student123')
+
+    formation = Formation.query.first()
+    if not formation:
+        formation = Formation(
+            nom='BUT Informatique',
+            nb_groupes_td=2,
+            nb_groupes_tp=4
+        )
+        db.session.add(formation)
+        db.session.flush()
+
+        module1 = Module(
+            code='R1.01',
+            libelle='Initiation au développement',
+            cm_heures=10.0,
+            td_heures=15.0,
+            tp_heures=15.0,
+            formation_id=formation.id
+        )
+        db.session.add(module1)
+
+    db.session.commit()
+
+    return "BDD initialisée : admin@univ.fr / admin123"
 
 @admin_bp.route('/login', methods=['GET', 'POST'])
 def login():
