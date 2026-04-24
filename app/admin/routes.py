@@ -15,12 +15,12 @@ from app.models import User
 def init_db_route():
     db.create_all()
 
-    # créer un admin
-    admin = User(email="admin@test.com", role="admin")
-    admin.set_password("admin123")
-
-    db.session.add(admin)
-    db.session.commit()
+    existing_admin = User.query.filter_by(email="admin@test.com").first()
+    if not existing_admin:
+        admin = User(email="admin@test.com", role="admin")
+        admin.set_password("admin123")
+        db.session.add(admin)
+        db.session.commit()
 
     return "Base de données initialisée !"
 
