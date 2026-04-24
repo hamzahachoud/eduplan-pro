@@ -17,7 +17,7 @@ def init_db_route():
 
     existing_admin = User.query.filter_by(email="admin@test.com").first()
     if not existing_admin:
-        admin = User(email="admin@test.com", role="admin")
+        admin = User(email="admin@univ.fr", role="admin")
         admin.set_password("admin123")
         db.session.add(admin)
         db.session.commit()
