@@ -8,6 +8,22 @@ from datetime import date, time, datetime, timedelta
 
 admin_bp = Blueprint('admin', __name__)
 
+from app.extensions import db
+from app.models import User
+
+@admin_bp.route('/init-db')
+def init_db_route():
+    db.create_all()
+
+    # créer un admin
+    admin = User(email="admin@test.com", role="admin")
+    admin.set_password("admin123")
+
+    db.session.add(admin)
+    db.session.commit()
+
+    return "Base de données initialisée !"
+
 @admin_bp.route('/login', methods=['GET', 'POST'])
 def login():
     if current_user.is_authenticated:
