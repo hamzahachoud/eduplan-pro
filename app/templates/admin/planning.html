@@ -4,93 +4,160 @@
 <div class="row">
     <!-- Formulaire de Planification -->
     <div class="col-lg-4 mb-4">
-        <div class="glass-card animate-fade-in">
-            <h5 class="fw-bold mb-4"><i class="fas fa-calendar-alt me-2"></i> Programmation</h5>
+        <div class="data-card border-0 shadow-lg animate-fade-in sticky-top" style="top: 100px; z-index: 100;">
+            <div class="d-flex align-items-center mb-4">
+                <div class="bg-primary text-white rounded-3 p-2 me-3" style="width: 40px; height: 40px; display: inline-flex; align-items: center; justify-content: center;">
+                    <i class="fas fa-calendar-plus"></i>
+                </div>
+                <h5 class="fw-800 m-0">Nouvelle Séance</h5>
+            </div>
+            
             <form method="POST" action="">
                 {{ form.hidden_tag() }}
                 <div class="mb-3">
-                    <label class="form-label text-muted small">Module</label>
-                    {{ form.module_id(class="form-select") }}
-                </div>
-                <div class="mb-3">
-                    <label class="form-label text-muted small">Type de séance</label>
-                    {{ form.type_seance(class="form-select") }}
-                </div>
-                <div class="mb-3">
-                    <label class="form-label text-muted small">Enseignant</label>
-                    {{ form.enseignant_id(class="form-select") }}
-                </div>
-                <div class="mb-3">
-                    <label class="form-label text-muted small">Salle</label>
-                    {{ form.salle_id(class="form-select") }}
-                </div>
-                <div class="mb-3">
-                    <label class="form-label text-muted small">Groupe</label>
-                    <select name="groupe" class="form-select">
-                        {% for g_name in groupes_form %}
-                            <option value="{{ g_name }}">{{ g_name }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-                <div class="row">
-                    <div class="col-6 mb-3">
-                        <label class="form-label text-muted small">Date</label>
-                        {{ form.date_seance(class="form-control", type="date") }}
-                    </div>
-                    <div class="col-6 mb-3">
-                        <label class="form-label text-muted small">Début</label>
-                        {{ form.heure_debut(class="form-control", type="time") }}
+                    <label class="form-label">Formation</label>
+                    <div class="bg-light p-2 rounded-3 border fw-700 text-primary small">
+                        <i class="fas fa-graduation-cap me-2"></i> {{ current_formation.nom }}
                     </div>
                 </div>
+                
                 <div class="mb-3">
-                    <label class="form-label text-muted small">Durée (h)</label>
-                    {{ form.duree(class="form-control") }}
+                    <label class="form-label">Module</label>
+                    {{ form.module_id(class="form-select shadow-none") }}
                 </div>
-                {{ form.submit(class="btn btn-primary w-100 mt-2") }}
+                
+                <div class="row g-2">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Type</label>
+                        {{ form.type_seance(class="form-select shadow-none") }}
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Groupe</label>
+                        <select name="groupe" class="form-select shadow-none">
+                            {% for g_name in groupes_form %}
+                                <option value="{{ g_name }}">{{ g_name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Enseignant</label>
+                    {{ form.enseignant_id(class="form-select shadow-none") }}
+                </div>
+                
+                <div class="mb-3">
+                    <label class="form-label">Salle</label>
+                    {{ form.salle_id(class="form-select shadow-none") }}
+                </div>
+                
+                <div class="row g-2">
+                    <div class="col-6 mb-3">
+                        <label class="form-label">Date</label>
+                        {{ form.date_seance(class="form-control shadow-none", type="date") }}
+                    </div>
+                    <div class="col-6 mb-3">
+                        <label class="form-label">Heure</label>
+                        {{ form.heure_debut(class="form-control shadow-none", type="time") }}
+                    </div>
+                </div>
+                
+                <div class="row g-2">
+                    <div class="col-6 mb-3">
+                        <label class="form-label">Durée (h)</label>
+                        {{ form.duree(class="form-control shadow-none") }}
+                    </div>
+                    <div class="col-6 mb-3">
+                        <label class="form-label">Répétition</label>
+                        {{ form.nb_semaines(class="form-control shadow-none") }}
+                    </div>
+                </div>
+                
+                <button type="submit" class="btn btn-primary w-100 mt-2 py-3 shadow-sm">
+                    <i class="fas fa-plus-circle me-2"></i> Enregistrer la séance
+                </button>
             </form>
         </div>
     </div>
     
     <!-- Grille de Planning -->
     <div class="col-lg-8">
-        <div class="glass-card animate-fade-in" style="animation-delay: 0.2s;">
-            <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
-                <div class="d-flex align-items-center">
-                    <h5 class="fw-bold m-0 me-3"><i class="fas fa-calendar-week me-2"></i> {{ current_formation.nom }}</h5>
+        <div class="data-card border-0 shadow-lg mb-4 animate-fade-in" style="animation-delay: 0.1s;">
+            <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="bg-accent-light text-accent rounded-3 p-2 d-inline-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                        <i class="fas fa-calendar-week"></i>
+                    </div>
+                    <h5 class="fw-800 m-0">{{ current_formation.nom }}</h5>
                     <div class="dropdown no-print">
-                        <button class="btn btn-sm btn-outline-light dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                            Changer de formation
+                        <button class="btn btn-sm btn-secondary dropdown-toggle py-1 border-0 bg-light" type="button" data-bs-toggle="dropdown">
+                            Changer
                         </button>
-                        <ul class="dropdown-menu dropdown-menu-dark">
+                        <ul class="dropdown-menu shadow-xl border-0">
                             {% for f in formations %}
-                            <li><a class="dropdown-content dropdown-item {% if f.id == current_formation.id %}active{% endif %}" 
+                            <li><a class="dropdown-item py-2 small fw-600 {% if f.id == current_formation.id %}active bg-primary-light text-primary{% endif %}" 
                                    href="{{ url_for('admin.planning', fid=f.id) }}">
                                 {{ f.nom }}
                             </a></li>
                             {% endfor %}
-                            <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item small" href="{{ url_for('admin.formations') }}">Gérer les formations</a></li>
                         </ul>
                     </div>
                 </div>
                 
-                <form action="{{ url_for('admin.generate_planning', fid=current_formation.id) }}" method="POST" onsubmit="return confirm('Générer automatiquement toutes les séances manquantes ?');">
-                    <button type="submit" class="btn btn-sm btn-outline-warning">
-                        <i class="fas fa-magic me-1"></i> Générer Auto
+                <div class="d-flex flex-wrap gap-2">
+                    <div class="btn-group no-print shadow-sm rounded-pill overflow-hidden">
+                        <a href="{{ url_for('admin.export_csv', type_export='seances', fid=current_formation.id) }}" class="btn btn-sm btn-white border-end" title="Export CSV">
+                            <i class="fas fa-file-csv text-success"></i>
+                        </a>
+                        <a href="{{ url_for('admin.export_pdf_planning', fid=current_formation.id) }}" class="btn btn-sm btn-white" title="Export PDF">
+                            <i class="fas fa-file-pdf text-danger"></i>
+                        </a>
+                    </div>
+                    <button type="button" class="btn btn-sm btn-secondary no-print shadow-sm px-3" data-bs-toggle="modal" data-bs-target="#duplicateModal">
+                        <i class="fas fa-copy me-1 text-primary"></i> Dupliquer
                     </button>
-                </form>
+                    <form action="{{ url_for('admin.generate_planning', fid=current_formation.id) }}" method="POST" class="no-print d-flex align-items-center gap-3" onsubmit="return confirm('Générer automatiquement toutes les séances manquantes ?');">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <div class="form-check form-switch m-0 d-none d-sm-block">
+                            <input class="form-check-input" type="checkbox" name="allow_overload" id="allowOverload">
+                            <label class="form-check-label x-small fw-700 text-muted" for="allowOverload">Surcharges</label>
+                        </div>
+                        <button type="submit" class="btn btn-sm btn-primary px-3 shadow-sm">
+                            <i class="fas fa-magic me-1"></i> Auto
+                        </button>
+                    </form>
+                </div>
             </div>
+            
+            <!-- Navigation Semaine -->
+            <div class="d-flex justify-content-between align-items-center mt-4 p-2 bg-light rounded-pill border">
+                <a href="{{ url_for('admin.planning', fid=current_formation.id, date=prev_week) }}" class="btn btn-sm btn-white rounded-circle shadow-sm" style="width: 32px; height: 32px; padding: 0;">
+                    <i class="fas fa-chevron-left x-small"></i>
+                </a>
+                <div class="text-center">
+                    <div class="fw-800 text-primary small">Semaine du {{ lundi.strftime('%d/%m') }} au {{ samedi.strftime('%d/%m/%Y') }}</div>
+                </div>
+                <a href="{{ url_for('admin.planning', fid=current_formation.id, date=next_week) }}" class="btn btn-sm btn-white rounded-circle shadow-sm" style="width: 32px; height: 32px; padding: 0;">
+                    <i class="fas fa-chevron-right x-small"></i>
+                </a>
+            </div>
+        </div>
 
-            {% for d in dates %}
-            <div class="mb-5 last-child-mb-0">
-                <h6 class="text-primary fw-bold mb-3 border-bottom border-primary border-opacity-25 pb-2">
-                    <i class="fas fa-calendar-day me-2"></i> {{ d.strftime('%A %d %B %Y') }}
+        {% for d in dates %}
+        <div class="data-card mb-4 border-0 shadow-lg p-0 overflow-hidden animate-fade-in">
+            <div class="bg-light border-bottom p-3 d-flex justify-content-between align-items-center">
+                <h6 class="fw-800 m-0 text-dark text-capitalize">
+                    <i class="fas fa-calendar-day me-2 text-primary"></i> {{ d.strftime('%A %d %B %Y') }}
                 </h6>
-                <div class="table-responsive">
-                    <table class="table table-bordered border-white border-opacity-10 text-center align-middle" style="table-layout: fixed;">
-                        <thead class="bg-white bg-opacity-5">
+                <div class="badge bg-white text-primary border shadow-sm">{{ grid_data[d]|length if grid_data[d] else 0 }} Créneaux</div>
+            </div>
+            
+            <div class="p-3">
+                <div class="planning-grid-container">
+                    <table class="planning-table w-100 text-center">
+                        <thead>
                             <tr>
-                                <th style="width: 80px;">Heure</th>
+                                <th class="time-col">Heure</th>
                                 {% for g in groupes %}
                                     <th class="small">{{ g }}</th>
                                 {% endfor %}
@@ -100,147 +167,121 @@
                             {% for t in creneaux %}
                                 {% if grid_data[d] and grid_data[d][t] %}
                                 <tr>
-                                    <td class="small fw-bold text-muted bg-white bg-opacity-5">{{ t.strftime('%H:%M') }}</td>
+                                    <td class="time-col small fw-800 text-primary">{{ t.strftime('%H:%M') }}</td>
                                     
-                                    {# Gestion spéciale pour le CM qui occupe toute la ligne #}
+                                    {# CM occupent toute la ligne #}
                                     {% if grid_data[d][t]['CM'] %}
-                                        <td colspan="{{ groupes|length }}" class="p-1">
+                                        <td colspan="{{ groupes|length }}" class="p-2">
                                             {% set s = grid_data[d][t]['CM'] %}
-                                            <div class="glass-card p-2 bg-primary bg-opacity-40 border-primary position-relative h-100">
-                                                
-                                                {# SWAP MODULE #}
-                                                <form action="{{ url_for('admin.update_seance_module') }}" method="POST" class="no-print mb-1">
-                                                    <input type="hidden" name="seance_id" value="{{ s.id }}">
-                                                    <select name="module_id" class="form-select form-select-mini bg-dark text-white border-0 planning-text" onchange="this.form.submit()">
-                                                        {% for mod in modules %}
-                                                        <option value="{{ mod.id }}" {% if s.module_id == mod.id %}selected{% endif %}>
-                                                            {{ mod.code }}
-                                                        </option>
-                                                        {% endfor %}
-                                                    </select>
-                                                </form>
-
-                                                {# SWAP PROF (FILTRÉ) #}
-                                                <form action="{{ url_for('admin.update_seance_enseignant') }}" method="POST" class="no-print mb-1">
-                                                    <input type="hidden" name="seance_id" value="{{ s.id }}">
-                                                    <select name="enseignant_id" class="form-select form-select-mini bg-dark bg-opacity-50 text-white border-0" onchange="this.form.submit()">
-                                                        <option value="">Aucun</option>
-                                                        {% for ens in enseignants %}
-                                                            {% if ens.id in allowed_instructors[s.module_id] %}
-                                                            <option value="{{ ens.id }}" {% if s.enseignant_id == ens.id %}selected{% endif %}>
-                                                                {{ ens.nom }}
-                                                            </option>
-                                                            {% endif %}
-                                                        {% endfor %}
-                                                    </select>
-                                                </form>
-
-                                                {# SWAP SALLE #}
-                                                <form action="{{ url_for('admin.update_seance_salle') }}" method="POST" class="no-print">
-                                                    <input type="hidden" name="seance_id" value="{{ s.id }}">
-                                                    <select name="salle_id" class="form-select form-select-mini bg-dark bg-opacity-50 text-white border-0" onchange="this.form.submit()">
-                                                        <option value="">Salle ?</option>
-                                                        {% for sl in salles %}
-                                                            {# Pour CM : Seulement Amphi #}
-                                                            {% if sl.type_salle == 'Amphi' %}
-                                                                <option value="{{ sl.id }}" {% if s.salle_id == sl.id %}selected{% endif %}>
-                                                                    {{ sl.nom }}
-                                                                </option>
-                                                            {% endif %}
-                                                        {% endfor %}
-                                                    </select>
-                                                </form>
-
-                                                <div class="x-small text-white-50 mt-1">
-                                                    <i class="far fa-clock me-1"></i> {{ s.heure_debut.strftime('%H:%M') }} - {{ s.heure_fin.strftime('%H:%M') }}
+                                            {% set is_alert = not s.enseignant_id or not s.salle_id %}
+                                            <div class="seance-card seance-cm {{ 'border-danger border-2' if is_alert else '' }} position-relative mx-auto hover-lift" style="max-width: 600px;">
+                                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                                    <span class="badge bg-primary shadow-sm">Cours Magistral</span>
+                                                    <form method="POST" action="{{ url_for('admin.delete_seance', id=s.id) }}" class="no-print" onsubmit="return confirm('Supprimer cette séance ?');">
+                                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                                        <button type="submit" class="btn-delete-mini"><i class="fas fa-times-circle"></i></button>
+                                                    </form>
                                                 </div>
-
-                                                <a href="{{ url_for('admin.delete_seance', id=s.id) }}" class="btn-delete-mini">
-                                                    <i class="fas fa-times"></i>
-                                                </a>
+                                                
+                                                <div class="row g-2 align-items-center">
+                                                    <div class="col-md-5">
+                                                        <div class="fw-800 text-dark">{{ s.module.code }}</div>
+                                                        <div class="x-small text-muted fw-600">{{ s.module.libelle|truncate(30) }}</div>
+                                                    </div>
+                                                    <div class="col-md-7">
+                                                        <div class="d-flex gap-2">
+                                                            <div class="flex-grow-1">
+                                                                <form action="{{ url_for('admin.update_seance_enseignant') }}" method="POST">
+                                                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                                                    <input type="hidden" name="seance_id" value="{{ s.id }}">
+                                                                    <select name="enseignant_id" class="form-select form-select-sm border-0 bg-white bg-opacity-50 x-small fw-700 {{ 'text-danger' if not s.enseignant_id else 'text-dark' }}" onchange="this.form.submit()">
+                                                                        <option value="">👤 Prof ?</option>
+                                                                        {% for ens in enseignants %}
+                                                                            {% if ens.id in allowed_instructors[s.module_id] %}
+                                                                            <option value="{{ ens.id }}" {% if s.enseignant_id == ens.id %}selected{% endif %}>{{ ens.nom }}</option>
+                                                                            {% endif %}
+                                                                        {% endfor %}
+                                                                    </select>
+                                                                </form>
+                                                            </div>
+                                                            <div class="flex-grow-1">
+                                                                <form action="{{ url_for('admin.update_seance_salle') }}" method="POST">
+                                                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                                                    <input type="hidden" name="seance_id" value="{{ s.id }}">
+                                                                    <select name="salle_id" class="form-select form-select-sm border-0 bg-white bg-opacity-50 x-small fw-700 {{ 'text-danger' if not s.salle_id else 'text-dark' }}" onchange="this.form.submit()">
+                                                                        <option value="">🚪 Salle ?</option>
+                                                                        {% for sl in salles %}
+                                                                            {% if sl.type_salle == 'Amphi' %}
+                                                                                <option value="{{ sl.id }}" {% if s.salle_id == sl.id %}selected{% endif %}>{{ sl.nom }}</option>
+                                                                            {% endif %}
+                                                                        {% endfor %}
+                                                                    </select>
+                                                                </form>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </td>
                                     {% else %}
-                                        {# Affichage des colonnes par groupe pour les TD/TP #}
+                                        {# TD/TP colonnes par groupe #}
                                         {% for g in groupes %}
-                                            <td class="p-1" style="min-height: 120px;">
+                                            <td class="p-2">
                                                 {% if grid_data[d][t][g] %}
                                                     {% set s = grid_data[d][t][g] %}
-                                                    <div class="glass-card p-2 border-opacity-50 h-100 position-relative 
-                                                        {% if s.type_seance == 'TD' %}bg-success bg-opacity-40 border-success{% else %}bg-warning bg-opacity-40 border-warning{% endif %}">
-                                                        
-                                                        {# SWAP MODULE #}
-                                                        <form action="{{ url_for('admin.update_seance_module') }}" method="POST" class="no-print mb-1">
-                                                            <input type="hidden" name="seance_id" value="{{ s.id }}">
-                                                            <select name="module_id" class="form-select form-select-mini bg-dark text-white border-0 planning-text" onchange="this.form.submit()">
-                                                                {% for mod in modules %}
-                                                                <option value="{{ mod.id }}" {% if s.module_id == mod.id %}selected{% endif %}>
-                                                                    {{ mod.code }}
-                                                                </option>
-                                                                {% endfor %}
-                                                            </select>
-                                                        </form>
-
-                                                        <div class="x-small text-white-50 mb-1">
-                                                            <i class="far fa-clock me-1"></i> {{ s.heure_debut.strftime('%H:%M') }} - {{ s.heure_fin.strftime('%H:%M') }}
+                                                    {% set base_class = 'seance-td' if s.type_seance == 'TD' else 'seance-tp' %}
+                                                    {% set is_alert = not s.enseignant_id or not s.salle_id %}
+                                                    
+                                                    <div class="seance-card {{ base_class }} {{ 'border-danger border-2' if is_alert else '' }} p-2 min-vh-0 hover-lift">
+                                                        <div class="d-flex justify-content-between mb-2">
+                                                            <span class="badge {% if s.type_seance == 'TD' %}bg-success{% else %}bg-warning text-dark{% endif %} px-2 py-1" style="font-size: 0.6rem;">{{ s.type_seance }}</span>
+                                                            <form method="POST" action="{{ url_for('admin.delete_seance', id=s.id) }}" class="no-print">
+                                                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                                                <button type="submit" class="btn-delete-mini"><i class="fas fa-times-circle"></i></button>
+                                                            </form>
                                                         </div>
                                                         
-                                                        {# SWAP PROF (FILTRÉ) #}
-                                                        <form action="{{ url_for('admin.update_seance_enseignant') }}" method="POST" class="no-print mb-1">
+                                                        <div class="fw-800 small text-dark mb-2">{{ s.module.code }}</div>
+                                                        
+                                                        <form action="{{ url_for('admin.update_seance_enseignant') }}" method="POST" class="mb-1">
+                                                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                                                             <input type="hidden" name="seance_id" value="{{ s.id }}">
-                                                            <select name="enseignant_id" class="form-select form-select-mini bg-dark bg-opacity-50 text-white border-0" onchange="this.form.submit()">
-                                                                <option value="">Aucun</option>
+                                                            <select name="enseignant_id" class="form-select form-select-sm border-0 bg-white bg-opacity-40 x-small fw-600 {{ 'text-danger' if not s.enseignant_id else '' }}" onchange="this.form.submit()">
+                                                                <option value="">👤 Prof ?</option>
                                                                 {% for ens in enseignants %}
                                                                     {% if ens.id in allowed_instructors[s.module_id] %}
-                                                                    <option value="{{ ens.id }}" {% if s.enseignant_id == ens.id %}selected{% endif %}>
-                                                                        {{ ens.nom }}
-                                                                    </option>
+                                                                    <option value="{{ ens.id }}" {% if s.enseignant_id == ens.id %}selected{% endif %}>{{ ens.nom }}</option>
                                                                     {% endif %}
                                                                 {% endfor %}
                                                             </select>
                                                         </form>
 
-                                                        {# SWAP SALLE #}
-                                                        <form action="{{ url_for('admin.update_seance_salle') }}" method="POST" class="no-print">
+                                                        <form action="{{ url_for('admin.update_seance_salle') }}" method="POST">
+                                                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                                                             <input type="hidden" name="seance_id" value="{{ s.id }}">
-                                                            <select name="salle_id" class="form-select form-select-mini bg-dark bg-opacity-50 text-white border-0" onchange="this.form.submit()">
-                                                                <option value="">Salle ?</option>
+                                                            <select name="salle_id" class="form-select form-select-sm border-0 bg-white bg-opacity-40 x-small fw-600 {{ 'text-danger' if not s.salle_id else '' }}" onchange="this.form.submit()">
+                                                                <option value="">🚪 Salle ?</option>
                                                                 {% for sl in salles %}
                                                                     {% set show_salle = false %}
-                                                                    {# TD -> Salles TD #}
                                                                     {% if s.type_seance == 'TD' and sl.type_salle == 'TD' %}
                                                                         {% set show_salle = true %}
-                                                                    {# TP -> Salles TP + Filtre catégorie strict #}
                                                                     {% elif s.type_seance == 'TP' and sl.type_salle == 'TP' %}
                                                                         {% if s.module.categorie %}
                                                                             {% set mod_cat = s.module.categorie.lower().strip() %}
                                                                             {% set room_cat = sl.categorie.lower().strip() if sl.categorie else "" %}
-                                                                            
-                                                                            {# Mapping Info #}
-                                                                            {% set is_info_module = mod_cat in ['python', 'linux', 'programation', 'bdd', 'info'] %}
-                                                                            
-                                                                            {% if is_info_module and room_cat == 'info' %}
-                                                                                {% set show_salle = true %}
-                                                                            {% elif room_cat == mod_cat %}
+                                                                            {% if (mod_cat in ['python', 'linux', 'info', 'bdd'] and room_cat == 'info') or room_cat == mod_cat %}
                                                                                 {% set show_salle = true %}
                                                                             {% endif %}
                                                                         {% else %}
                                                                             {% set show_salle = true %}
                                                                         {% endif %}
                                                                     {% endif %}
-
                                                                     {% if show_salle %}
-                                                                        <option value="{{ sl.id }}" {% if s.salle_id == sl.id %}selected{% endif %}>
-                                                                            {{ sl.nom }}
-                                                                        </option>
+                                                                        <option value="{{ sl.id }}" {% if s.salle_id == sl.id %}selected{% endif %}>{{ sl.nom }}</option>
                                                                     {% endif %}
                                                                 {% endfor %}
                                                             </select>
                                                         </form>
-
-                                                        <a href="{{ url_for('admin.delete_seance', id=s.id) }}" class="btn-delete-mini">
-                                                            <i class="fas fa-times"></i>
-                                                        </a>
                                                     </div>
                                                 {% endif %}
                                             </td>
@@ -253,94 +294,54 @@
                     </table>
                 </div>
             </div>
-            {% else %}
-                <div class="text-center py-5 text-muted">
-                    <i class="fas fa-calendar-times fa-3x mb-3"></i>
-                    <p>Aucune séance planifiée. Utilisez le formulaire ou la génération automatique.</p>
-                </div>
-            {% endfor %}
         </div>
+        {% endfor %}
     </div>
 </div>
 
 <style>
-.x-small { font-size: 0.7rem; }
-.btn-delete-mini {
-    position: absolute;
-    top: 2px;
-    right: 2px;
-    color: rgba(255,255,255,0.4);
-    font-size: 0.7rem;
-    padding: 0 4px;
-}
-.btn-delete-mini:hover { color: #ff4b2b; }
-.last-child-mb-0:last-child { margin-bottom: 0 !important; }
+.btn-delete-mini { background: transparent; border: none; color: rgba(0,0,0,0.2); transition: var(--transition); }
+.btn-delete-mini:hover { color: var(--danger); transform: scale(1.1); }
+.form-select-sm { padding: 0.25rem 0.5rem; font-size: 0.7rem; }
+.btn-white { background: white; color: var(--text-secondary); border: 1px solid var(--border); }
+.btn-white:hover { background: var(--bg-body); color: var(--primary); }
 </style>
 
 <script>
+// Scripts de filtrage (identiques mais adaptés si nécessaire pour les classes)
 document.addEventListener('DOMContentLoaded', function() {
     const moduleSelect = document.getElementById('module_id');
     const teacherSelect = document.getElementById('enseignant_id');
     const typeSelect = document.getElementById('type_seance');
     const salleSelect = document.getElementById('salle_id');
-    
     const allowedInstructors = {{ allowed_instructors|tojson }};
     const modulesData = {{ modules_data|tojson }};
     const sallesData = {{ salles_data|tojson }};
-    
-    // Garder une copie de toutes les salles pour pouvoir les filtrer
-    const allSalles = Array.from(salleSelect.options).map(opt => ({
-        value: opt.value,
-        text: opt.text
-    }));
+    const allSalles = Array.from(salleSelect.options).map(opt => ({ value: opt.value, text: opt.text }));
 
     function filterSalles() {
         if (!salleSelect) return;
-        
         const moduleId = moduleSelect.value;
         const typeSeance = typeSelect.value;
         const moduleCat = (modulesData[moduleId] && modulesData[moduleId].categorie) ? modulesData[moduleId].categorie.toLowerCase().trim() : null;
-        
         const currentValue = salleSelect.value;
-        
-        // Vider le select
         salleSelect.innerHTML = '';
-        
-        // Liste des catégories Info (Mapping)
-        const infoAliases = ['python', 'linux', 'programation', 'bdd', 'info', 'logiciel'];
 
         allSalles.forEach(s => {
-            if (s.value === "") {
-                const opt = new Option(s.text, s.value);
-                salleSelect.add(opt);
-                return;
-            }
-            
+            if (s.value === "") { salleSelect.add(new Option(s.text, s.value)); return; }
             const info = sallesData[s.value];
             if (!info) return;
-
             let show = false;
             const rCat = info.categorie ? info.categorie.toLowerCase().trim() : "";
-
-            if (typeSeance === 'CM') {
-                if (info.type === 'Amphi') show = true;
-            } else if (typeSeance === 'TD') {
-                if (info.type === 'TD') show = true;
-            } else if (typeSeance === 'TP') {
+            if (typeSeance === 'CM') { if (info.type === 'Amphi') show = true; } 
+            else if (typeSeance === 'TD') { if (info.type === 'TD') show = true; } 
+            else if (typeSeance === 'TP') {
                 if (info.type === 'TP') {
                     if (moduleCat) {
-                        const isInfoModule = infoAliases.includes(moduleCat);
-                        if (isInfoModule && rCat === 'info') {
-                            show = true;
-                        } else if (rCat === moduleCat) {
-                            show = true;
-                        }
-                    } else {
-                        show = true; 
-                    }
+                        if ((['python', 'linux', 'info', 'bdd'].includes(moduleCat) && rCat === 'info') || (rCat === moduleCat)) show = true;
+                    } else show = true;
                 }
             }
-
             if (show) {
                 const opt = new Option(s.text, s.value);
                 if (s.value === currentValue) opt.selected = true;
@@ -353,34 +354,53 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!teacherSelect || !moduleSelect) return;
         const moduleId = moduleSelect.value;
         const allowedIds = allowedInstructors[moduleId] || [];
-        const currentValue = teacherSelect.value;
-
         Array.from(teacherSelect.options).forEach(option => {
             if (option.value === "" || allowedIds.includes(parseInt(option.value))) {
-                option.hidden = false;
-                option.disabled = false;
-                option.style.display = 'block';
+                option.hidden = false; option.disabled = false; option.style.display = 'block';
             } else {
-                option.hidden = true;
-                option.disabled = true;
-                option.style.display = 'none';
-                if (option.value === currentValue) {
-                    teacherSelect.value = "";
-                }
+                option.hidden = true; option.disabled = true; option.style.display = 'none';
+                if (option.value === teacherSelect.value) teacherSelect.value = "";
             }
         });
     }
 
-    if (moduleSelect) {
-        moduleSelect.addEventListener('change', () => { filterTeachers(); filterSalles(); });
-    }
-    if (typeSelect) {
-        typeSelect.addEventListener('change', filterSalles);
-    }
-    
-    // Filtre initial
-    filterTeachers();
-    filterSalles();
+    if (moduleSelect) moduleSelect.addEventListener('change', () => { filterTeachers(); filterSalles(); });
+    if (typeSelect) typeSelect.addEventListener('change', filterSalles);
+    filterTeachers(); filterSalles();
 });
 </script>
+{% endblock %}
+
+{% block modals %}
+<div class="modal fade" id="duplicateModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content data-card border-0 shadow-xl p-0">
+            <div class="modal-header border-0 p-4 pb-0">
+                <h5 class="modal-title fw-800 text-dark"><i class="fas fa-copy me-2 text-primary"></i> Dupliquer la semaine</h5>
+                <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal"></button>
+            </div>
+            <form action="{{ url_for('admin.duplicate_week', fid=current_formation.id) }}" method="POST">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <div class="modal-body p-4">
+                    <p class="text-muted small mb-4">Copiez toutes les séances de <strong>{{ current_formation.nom }}</strong> vers une nouvelle semaine.</p>
+                    <div class="mb-4">
+                        <label class="form-label">Semaine source</label>
+                        <input type="date" name="source_week" class="form-control" value="{{ monday.strftime('%Y-%m-%d') }}" required>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label">Semaine cible</label>
+                        <input type="date" name="target_week" class="form-control" value="{{ next_week.strftime('%Y-%m-%d') if next_week else '' }}" required>
+                    </div>
+                    <div class="bg-primary-light text-primary rounded-3 p-3 x-small fw-600">
+                        <i class="fas fa-info-circle me-2"></i> Les séances en conflit ne seront pas copiées.
+                    </div>
+                </div>
+                <div class="modal-footer border-0 p-4 pt-0">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                    <button type="submit" class="btn btn-primary px-4 shadow-sm">Dupliquer</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 {% endblock %}

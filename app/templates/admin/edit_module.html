@@ -3,60 +3,74 @@
 {% block content %}
 <div class="row justify-content-center">
     <div class="col-lg-6">
-        <div class="glass-card animate-fade-in">
-            <div class="d-flex align-items-center mb-4">
-                <a href="{{ url_for('admin.modules') }}" class="btn btn-sm btn-outline-secondary me-3">
+        <div class="data-card border-0 shadow-xl animate-fade-in p-5">
+            <div class="d-flex align-items-center mb-5 pb-4 border-bottom">
+                <a href="{{ url_for('admin.modules') }}" class="btn btn-white btn-sm rounded-circle shadow-sm me-4 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
                     <i class="fas fa-arrow-left"></i>
                 </a>
                 <div>
-                    <h4 class="fw-bold mb-0"><i class="fas fa-edit me-2"></i>Modifier le module</h4>
-                    <p class="text-muted small mb-0">{{ module.code }} – {{ module.libelle }}</p>
+                    <h5 class="fw-800 mb-0 text-dark">Mise à jour du Module</h5>
+                    <p class="text-muted small mb-0 fw-600"><span class="text-primary">{{ module.code }}</span> – {{ module.libelle }}</p>
                 </div>
             </div>
             
             <form method="POST" action="{{ url_for('admin.edit_module', id=module.id) }}">
-                <div class="mb-4">
-                    <label class="form-label fw-semibold">Catégorie</label>
-                    <select name="categorie" class="form-select">
-                        <option value="">-- Aucune catégorie --</option>
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                
+                <div class="mb-5">
+                    <label class="form-label d-flex align-items-center">
+                        <i class="fas fa-tag me-2 text-primary"></i> Catégorie de Spécialisation
+                    </label>
+                    <select name="categorie" class="form-select py-3 shadow-none border-2">
+                        <option value="">-- Sans spécialisation particulière --</option>
                         {% for cat in categories %}
                         <option value="{{ cat }}" {% if module.categorie and module.categorie.lower() == cat.lower() %}selected{% endif %}>
                             {{ cat | capitalize }}
                         </option>
                         {% endfor %}
                     </select>
-                    <small class="text-muted">Détermine les salles de TP compatibles</small>
+                    <div class="bg-light p-3 rounded-3 mt-3 d-flex align-items-center gap-3">
+                        <i class="fas fa-info-circle text-primary opacity-50"></i>
+                        <span class="x-small text-muted fw-600">Cette catégorie permet au moteur de planning de filtrer automatiquement les salles de TP adaptées.</span>
+                    </div>
                 </div>
                 
-                <hr style="border-color: rgba(255,255,255,0.1)">
-                
-                <label class="form-label fw-semibold mb-3">Volume horaire (en heures)</label>
-                <div class="row g-3 mb-4">
-                    <div class="col-4">
-                        <label class="form-label text-muted small">h CM</label>
-                        <input type="number" name="cm_heures" class="form-control text-center fw-bold" 
-                               step="0.5" min="0" value="{{ module.cm_heures }}">
-                    </div>
-                    <div class="col-4">
-                        <label class="form-label text-muted small">h TD / groupe</label>
-                        <input type="number" name="td_heures" class="form-control text-center fw-bold" 
-                               step="0.5" min="0" value="{{ module.td_heures }}">
-                    </div>
-                    <div class="col-4">
-                        <label class="form-label text-muted small">h TP / groupe</label>
-                        <input type="number" name="tp_heures" class="form-control text-center fw-bold" 
-                               step="0.5" min="0" value="{{ module.tp_heures }}">
+                <div class="bg-light p-4 rounded-3 border-0 mb-5">
+                    <label class="form-label fw-800 mb-4 d-block text-dark">
+                        <i class="far fa-clock me-2 text-primary"></i> Volume Horaire (h)
+                    </label>
+                    <div class="row g-4">
+                        <div class="col-4">
+                            <label class="form-label text-muted x-small text-uppercase fw-800 text-center d-block">CM</label>
+                            <input type="number" name="cm_heures" class="form-control text-center fw-800 py-3 shadow-none border-2" 
+                                   step="0.5" min="0" value="{{ module.cm_heures }}">
+                        </div>
+                        <div class="col-4">
+                            <label class="form-label text-muted x-small text-uppercase fw-800 text-center d-block">TD / gp</label>
+                            <input type="number" name="td_heures" class="form-control text-center fw-800 py-3 shadow-none border-2" 
+                                   step="0.5" min="0" value="{{ module.td_heures }}">
+                        </div>
+                        <div class="col-4">
+                            <label class="form-label text-muted x-small text-uppercase fw-800 text-center d-block">TP / gp</label>
+                            <input type="number" name="tp_heures" class="form-control text-center fw-800 py-3 shadow-none border-2" 
+                                   step="0.5" min="0" value="{{ module.tp_heures }}">
+                        </div>
                     </div>
                 </div>
 
-                <div class="d-flex gap-3">
-                    <a href="{{ url_for('admin.modules') }}" class="btn btn-outline-secondary flex-fill">Annuler</a>
-                    <button type="submit" class="btn btn-primary flex-fill">
-                        <i class="fas fa-save me-2"></i>Enregistrer
+                <div class="d-flex gap-3 pt-3">
+                    <a href="{{ url_for('admin.modules') }}" class="btn btn-secondary flex-fill py-3 fw-800">Annuler</a>
+                    <button type="submit" class="btn btn-primary flex-fill py-3 fw-800 shadow-sm">
+                        <i class="fas fa-save me-2"></i> Enregistrer
                     </button>
                 </div>
             </form>
         </div>
     </div>
 </div>
+
+<style>
+.btn-white { background: white; color: var(--text-secondary); border: 1px solid var(--border); }
+.btn-white:hover { background: var(--bg-body); color: var(--primary); }
+</style>
 {% endblock %}

@@ -4,129 +4,208 @@
 <div class="row">
     <!-- Ajouter un Enseignant -->
     <div class="col-lg-4 mb-4">
-        <div class="glass-card mb-4 animate-fade-in">
-            <h5 class="fw-bold mb-4"><i class="fas fa-user-plus me-2"></i> Nouvel Intervenant</h5>
+        <div class="data-card mb-4 border-0 shadow-lg animate-fade-in">
+            <div class="d-flex align-items-center mb-4">
+                <div class="bg-primary text-white rounded-3 p-2 me-3" style="width: 40px; height: 40px; display: inline-flex; align-items: center; justify-content: center;">
+                    <i class="fas fa-user-plus"></i>
+                </div>
+                <h5 class="fw-800 m-0">Nouvel Intervenant</h5>
+            </div>
             <form method="POST" action="">
                 {{ form_enseignant.hidden_tag() }}
-                <div class="mb-3">
-                    <label class="form-label text-muted small">Nom</label>
-                    {{ form_enseignant.nom(class="form-control") }}
+                <div class="row g-2">
+                    <div class="col-6 mb-3">
+                        <label class="form-label">Nom</label>
+                        {{ form_enseignant.nom(class="form-control shadow-none", placeholder="ex: DUPONT") }}
+                    </div>
+                    <div class="col-6 mb-3">
+                        <label class="form-label">Prénom</label>
+                        {{ form_enseignant.prenom(class="form-control shadow-none", placeholder="ex: Jean") }}
+                    </div>
                 </div>
-                <div class="mb-3">
-                    <label class="form-label text-muted small">Prénom</label>
-                    {{ form_enseignant.prenom(class="form-control") }}
-                </div>
-                <input type="submit" name="submit_enseignant" value="Ajouter l'enseignant" class="btn btn-primary w-100 mt-2">
+                <button type="submit" name="submit_enseignant" class="btn btn-primary w-100 mt-2 py-3 shadow-sm">
+                    <i class="fas fa-plus-circle me-2"></i> Ajouter l'enseignant
+                </button>
             </form>
         </div>
 
         <!-- Affecter des heures -->
-        <div class="glass-card animate-fade-in" style="animation-delay: 0.1s;">
-            <h5 class="fw-bold mb-4"><i class="fas fa-link me-2"></i> Affectation d'heures</h5>
+        <div class="data-card border-0 shadow-lg animate-fade-in sticky-top" style="top: 100px; animation-delay: 0.1s;">
+            <div class="d-flex align-items-center mb-4">
+                <div class="bg-accent-light text-accent rounded-3 p-2 me-3" style="width: 40px; height: 40px; display: inline-flex; align-items: center; justify-content: center;">
+                    <i class="fas fa-link"></i>
+                </div>
+                <h5 class="fw-800 m-0">Affectation d'heures</h5>
+            </div>
             <form method="POST" action="">
                 {{ form_affectation.hidden_tag() }}
                 <div class="mb-3">
-                    <label class="form-label text-muted small">Sélectionner l'Enseignant</label>
-                    {{ form_affectation.enseignant_id(class="form-select") }}
+                    <label class="form-label">Enseignant</label>
+                    {{ form_affectation.enseignant_id(class="form-select shadow-none") }}
                 </div>
                 <div class="mb-3">
-                    <label class="form-label text-muted small">Sélectionner le Module</label>
-                    {{ form_affectation.module_id(class="form-select") }}
+                    <label class="form-label">Module cible</label>
+                    {{ form_affectation.module_id(class="form-select shadow-none") }}
                 </div>
-                <div class="row">
+                <div class="row g-2">
                     <div class="col-4 mb-3">
-                        <label class="form-label text-muted small">h CM</label>
-                        {{ form_affectation.cm_heures(class="form-control") }}
+                        <label class="form-label text-center d-block">CM</label>
+                        {{ form_affectation.cm_heures(class="form-control shadow-none text-center") }}
                     </div>
                     <div class="col-4 mb-3">
-                        <label class="form-label text-muted small">h TD</label>
-                        {{ form_affectation.td_heures(class="form-control") }}
+                        <label class="form-label text-center d-block">TD</label>
+                        {{ form_affectation.td_heures(class="form-control shadow-none text-center") }}
                     </div>
                     <div class="col-4 mb-3">
-                        <label class="form-label text-muted small">h TP</label>
-                        {{ form_affectation.tp_heures(class="form-control") }}
+                        <label class="form-label text-center d-block">TP</label>
+                        {{ form_affectation.tp_heures(class="form-control shadow-none text-center") }}
                     </div>
                 </div>
-                <input type="submit" name="submit_affectation" value="Valider l'affectation" class="btn btn-primary w-100 mt-2">
+                <button type="submit" name="submit_affectation" class="btn btn-primary w-100 mt-2 py-3 shadow-sm" style="background: var(--accent); border-color: var(--accent);">
+                    <i class="fas fa-check-circle me-2"></i> Valider l'affectation
+                </button>
             </form>
         </div>
     </div>
     
     <!-- Liste des Affectations -->
     <div class="col-lg-8">
-        <div class="glass-card animate-fade-in" style="animation-delay: 0.2s;">
-            <h5 class="fw-bold mb-4"><i class="fas fa-user-check me-2"></i> Répartition des enseignements</h5>
-            <div class="table-responsive">
-                <table class="table">
-                    <thead>
+        
+        <!-- BARRE DE RECHERCHE -->
+        <div class="data-card mb-4 border-0 shadow-sm animate-fade-in" style="animation-delay: 0.15s;">
+            <form method="GET" action="{{ url_for('admin.enseignants') }}" class="row g-3 align-items-end">
+                <div class="col-md-4">
+                    <div class="input-group input-group-sm">
+                        <span class="input-group-text bg-light border-end-0 text-muted"><i class="fas fa-search"></i></span>
+                        <input type="text" name="q" class="form-control border-start-0 ps-0 shadow-none" placeholder="Nom ou prénom..." value="{{ request.args.get('q', '') }}">
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <select name="module_id" class="form-select form-select-sm shadow-none">
+                        <option value="">Tous les modules</option>
+                        {% for m in modules %}
+                        <option value="{{ m.id }}" {% if request.args.get('module_id')|string == m.id|string %}selected{% endif %}>{{ m.code }} ({{ m.formation.nom }})</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <select name="status" class="form-select form-select-sm shadow-none">
+                        <option value="">Tous les statuts</option>
+                        <option value="surcharge" {% if request.args.get('status') == 'surcharge' %}selected{% endif %}>En surcharge</option>
+                        <option value="sans_affectation" {% if request.args.get('status') == 'sans_affectation' %}selected{% endif %}>Sans affectation</option>
+                    </select>
+                </div>
+                <div class="col-md-1">
+                    <button type="submit" class="btn btn-primary btn-sm w-100 py-1 shadow-sm"><i class="fas fa-filter"></i></button>
+                </div>
+            </form>
+        </div>
+
+        <div class="data-card border-0 shadow-lg animate-fade-in p-4" style="animation-delay: 0.2s;">
+            <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
+                <h5 class="fw-800 m-0"><i class="fas fa-user-check me-2 text-primary opacity-50"></i> Répartition des enseignements</h5>
+                <div class="d-flex flex-wrap gap-2">
+                    <button type="button" class="btn btn-sm btn-white px-3 shadow-sm" data-bs-toggle="modal" data-bs-target="#importEnseignantsModal">
+                        <i class="fas fa-upload text-info me-2"></i>Ens.
+                    </button>
+                    <button type="button" class="btn btn-sm btn-white px-3 shadow-sm" data-bs-toggle="modal" data-bs-target="#importAffectationsModal">
+                        <i class="fas fa-link text-warning me-2"></i>Aff.
+                    </button>
+                    <a href="{{ url_for('admin.export_csv', type_export='enseignants') }}" class="btn btn-sm btn-white px-3 shadow-sm">
+                        <i class="fas fa-download text-primary me-2"></i>Ens.
+                    </a>
+                    <a href="{{ url_for('admin.export_csv', type_export='affectations') }}" class="btn btn-sm btn-white px-3 shadow-sm">
+                        <i class="fas fa-file-csv text-success me-2"></i>Aff.
+                    </a>
+                </div>
+            </div>
+            
+            <div class="table-responsive border-0">
+                <table class="table table-hover align-middle">
+                    <thead class="bg-light">
                         <tr>
-                            <th>Enseignant</th>
+                            <th class="ps-4">Enseignant</th>
                             <th>Module</th>
-                            <th>H. Affectées</th>
+                            <th>Répartition Horaires</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for aff in affectations %}
                         <tr>
-                            <td class="fw-bold">{{ aff.enseignant.nom_complet() }}</td>
-                            <td>{{ aff.module.code }}</td>
+                            <td class="ps-4">
+                                <div class="fw-800 text-dark">{{ aff.enseignant.nom_complet() }}</div>
+                            </td>
+                            <td><span class="badge bg-primary-light text-primary fw-800">{{ aff.module.code }}</span></td>
                             <td>
-                                <span class="badge badge-custom badge-cm">{{ aff.cm_heures }}h CM</span>
-                                <span class="badge badge-custom badge-td">{{ aff.td_heures }}h TD</span>
-                                <span class="badge badge-custom badge-tp">{{ aff.tp_heures }}h TP</span>
+                                <div class="d-flex gap-2">
+                                    <span class="badge badge-cm px-3">{{ aff.cm_heures }}h CM</span>
+                                    <span class="badge badge-td px-3">{{ aff.td_heures }}h TD</span>
+                                    <span class="badge badge-tp px-3">{{ aff.tp_heures }}h TP</span>
+                                </div>
                             </td>
                         </tr>
                         {% else %}
                         <tr>
-                            <td colspan="3" class="text-center text-muted">Aucune affectation enregistrée.</td>
+                            <td colspan="3" class="py-5 text-center">
+                                <div class="bg-light rounded-circle mx-auto mb-3 d-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
+                                    <i class="fas fa-user-slash opacity-25 fa-2x"></i>
+                                </div>
+                                <p class="text-muted small">Aucune affectation trouvée.</p>
+                            </td>
                         </tr>
                         {% endfor %}
                     </tbody>
                 </table>
             </div>
-            </div>
         </div>
 
-        <!-- DASHBOARD DE CHARGE (NOUVEAU) -->
-        <div class="glass-card mt-4 animate-fade-in" style="animation-delay: 0.3s;">
-            <h5 class="fw-bold mb-4 text-warning"><i class="fas fa-chart-line me-2"></i> Suivi de la Charge de Travail</h5>
-            <div class="table-responsive">
-                <table class="table align-middle">
-                    <thead>
+        <!-- DASHBOARD DE CHARGE -->
+        <div class="data-card border-0 shadow-lg mt-4 animate-fade-in p-4" style="animation-delay: 0.3s;">
+            <div class="d-flex align-items-center mb-4">
+                <div class="bg-warning-light text-warning rounded-3 p-2 me-3" style="width: 40px; height: 40px; display: inline-flex; align-items: center; justify-content: center;">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <h5 class="fw-800 m-0">Suivi de la Charge de Travail</h5>
+            </div>
+            
+            <div class="table-responsive border-0">
+                <table class="table align-middle table-hover">
+                    <thead class="bg-light">
                         <tr>
-                            <th>Intervenant</th>
-                            <th>Charge Totale</th>
-                            <th style="width: 200px;">Progression Planning</th>
-                            <th>Restant</th>
+                            <th class="ps-4">Intervenant</th>
+                            <th>Charge Affectée</th>
+                            <th style="width: 300px;">Progression Planning</th>
+                            <th class="text-end pe-4">Statut</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for sp in stats_profs %}
                         <tr>
-                            <td>
-                                <div class="fw-bold">{{ sp.enseignant.nom_complet() }}</div>
-                            </td>
-                            <td><span class="badge bg-dark">{{ sp.total_affecte }}h</span></td>
+                            <td class="ps-4"><div class="fw-800 text-dark">{{ sp.enseignant.nom_complet() }}</div></td>
+                            <td><span class="badge bg-light text-dark border fw-800">{{ sp.total_affecte }}h</span></td>
                             <td>
                                 <div class="d-flex align-items-center">
-                                    <div class="progress progress-custom flex-grow-1 me-2" style="background: rgba(255,255,255,0.05);">
-                                        <div class="progress-bar {% if sp.h_sup > 0 %}bg-danger{% else %}bg-success{% endif %}" role="progressbar" 
-                                             style="width: {% if sp.percent > 100 %}100{% else %}{{ sp.percent }}{% endif %}%;" 
-                                             aria-valuenow="{{ sp.percent }}" aria-valuemin="0" aria-valuemax="100"></div>
+                                    <div class="progress flex-grow-1 me-3 shadow-none border-0" style="height: 8px; background: #f1f5f9;">
+                                        <div class="progress-bar {% if sp.h_sup > 0 %}bg-danger{% else %}bg-success{% endif %} rounded-pill" role="progressbar" 
+                                             style="width: {% if sp.percent > 100 %}100{% else %}{{ sp.percent }}{% endif %}%;"></div>
                                     </div>
-                                    <span class="x-small {% if sp.h_sup > 0 %}text-danger fw-bold{% endif %}">{{ sp.percent }}%</span>
+                                    <span class="x-small fw-800 {% if sp.h_sup > 0 %}text-danger{% else %}text-success{% endif %}">{{ sp.percent }}%</span>
                                 </div>
-                                <div class="x-small text-muted mt-1">{{ sp.total_planifie }}h planifiées</div>
+                                <div class="x-small text-muted mt-1 fw-600">{{ sp.total_planifie }}h planifiées / {{ sp.total_affecte }}h</div>
                             </td>
-                            <td>
+                            <td class="text-end pe-4">
                                 {% if sp.h_sup > 0 %}
-                                    <span class="badge bg-danger text-white animate-pulse">
-                                        +{{ sp.h_sup }}h suppl.
+                                    <span class="badge bg-danger-light text-danger border border-danger border-opacity-25 animate-pulse px-3">
+                                        <i class="fas fa-exclamation-triangle me-1"></i> +{{ sp.h_sup }}h sup.
+                                    </span>
+                                {% elif sp.percent == 100 %}
+                                    <span class="badge bg-success-light text-success border border-success border-opacity-25 px-3">
+                                        <i class="fas fa-check me-1"></i> Complet
                                     </span>
                                 {% else %}
-                                    <div class="text-success fw-bold">
-                                        {{ sp.reste }}h
-                                    </div>
+                                    <span class="text-primary fw-800 x-small bg-primary-light px-2 py-1 rounded-pill">
+                                        {{ sp.reste }}h restantes
+                                    </span>
                                 {% endif %}
                             </td>
                         </tr>
@@ -136,5 +215,85 @@
             </div>
         </div>
     </div>
+</div>
+
+<style>
+.btn-white { background: white; color: var(--text-secondary); border: 1px solid var(--border); }
+.btn-white:hover { background: var(--bg-body); color: var(--primary); }
+.progress-bar { transition: width 0.8s cubic-bezier(0.16, 1, 0.3, 1); }
+</style>
+{% endblock %}
+
+{% block modals %}
+<!-- Modal Import Enseignants -->
+<div class="modal fade" id="importEnseignantsModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content data-card border-0 shadow-xl p-0 overflow-hidden">
+      <div class="bg-primary p-4 text-white">
+        <h5 class="modal-title fw-800 m-0"><i class="fas fa-user-plus me-2"></i> Importer des Enseignants</h5>
+        <p class="x-small opacity-75 mb-0 mt-1">Mise à jour rapide de la base de données</p>
+      </div>
+      <div class="modal-body p-4">
+        <div class="bg-light p-3 rounded-3 mb-4">
+            <h6 class="fw-800 x-small text-uppercase mb-2 text-muted">Format attendu (CSV)</h6>
+            <code class="x-small">nom; prenom</code>
+        </div>
+        
+        <form action="{{ url_for('admin.import_csv', type_import='enseignants') }}" method="POST" enctype="multipart/form-data">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <div class="mb-4">
+                <label class="form-label">Fichier CSV</label>
+                <input class="form-control shadow-none" type="file" name="file" accept=".csv" required>
+            </div>
+            
+            <div class="d-flex align-items-center justify-content-between pt-3 border-top">
+                <a href="{{ url_for('admin.import_template', type_import='enseignants') }}" class="text-primary x-small fw-800 text-decoration-none hover-lift">
+                    <i class="fas fa-download me-1"></i> Modèle
+                </a>
+                <div class="d-flex gap-2">
+                    <button type="button" class="btn btn-secondary px-3" data-bs-dismiss="modal">Annuler</button>
+                    <button type="submit" class="btn btn-primary px-4 shadow-sm">Importer</button>
+                </div>
+            </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Import Affectations -->
+<div class="modal fade" id="importAffectationsModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content data-card border-0 shadow-xl p-0 overflow-hidden">
+      <div class="bg-accent p-4 text-white">
+        <h5 class="modal-title fw-800 m-0"><i class="fas fa-link me-2"></i> Importer des Affectations</h5>
+        <p class="x-small opacity-75 mb-0 mt-1">Lier les intervenants aux modules</p>
+      </div>
+      <div class="modal-body p-4">
+        <div class="bg-light p-3 rounded-3 mb-4">
+            <h6 class="fw-800 x-small text-uppercase mb-2 text-muted">Colonnes attendues (CSV)</h6>
+            <code class="x-small">enseignant_nom; enseignant_prenom; module_code; cm_heures; td_heures; tp_heures</code>
+        </div>
+        
+        <form action="{{ url_for('admin.import_csv', type_import='affectations') }}" method="POST" enctype="multipart/form-data">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <div class="mb-4">
+                <label class="form-label">Fichier CSV</label>
+                <input class="form-control shadow-none" type="file" name="file" accept=".csv" required>
+            </div>
+            
+            <div class="d-flex align-items-center justify-content-between pt-3 border-top">
+                <a href="{{ url_for('admin.import_template', type_import='affectations') }}" class="text-accent x-small fw-800 text-decoration-none hover-lift">
+                    <i class="fas fa-download me-1"></i> Modèle
+                </a>
+                <div class="d-flex gap-2">
+                    <button type="button" class="btn btn-secondary px-3" data-bs-dismiss="modal">Annuler</button>
+                    <button type="submit" class="btn btn-primary px-4 shadow-sm" style="background: var(--accent); border-color: var(--accent);">Lancer l'import</button>
+                </div>
+            </div>
+        </form>
+      </div>
+    </div>
+  </div>
 </div>
 {% endblock %}

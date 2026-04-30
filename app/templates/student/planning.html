@@ -1,95 +1,177 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="row align-items-center mb-4">
-    <div class="col-md-8">
-        <h2 class="fw-bold m-0"><i class="fas fa-calendar-week me-2 text-primary"></i> Mon Planning : {{ current_user.formation.nom if current_user.formation else '' }}</h2>
-        <div class="mt-2">
-            <span class="badge bg-primary bg-opacity-10 text-primary border border-primary border-opacity-25 px-3 py-2">
-                <i class="fas fa-users me-1"></i> {{ current_user.td_group }}
-            </span>
-            <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 px-3 py-2 ms-2">
-                <i class="fas fa-flask me-1"></i> {{ current_user.tp_group }}
-            </span>
+{# ── HEADER ÉTUDIANT ───────────────────────────────────────── #}
+<div class="data-card border-0 shadow-lg mb-5 animate-fade-in overflow-hidden p-0">
+    <div class="bg-primary p-4 text-white">
+        <div class="row align-items-center">
+            <div class="col-auto">
+                <div class="bg-white text-primary rounded-circle d-flex align-items-center justify-content-center shadow-sm fw-800 fs-4" style="width: 60px; height: 60px;">
+                    {{ current_user.prenom[0].upper() if current_user.prenom else 'E' }}
+                </div>
+            </div>
+            <div class="col">
+                <h4 class="fw-800 mb-1 text-white">{{ current_user.prenom }} {{ current_user.nom }}</h4>
+                <div class="d-flex flex-wrap gap-3 small opacity-90">
+                    <span><i class="fas fa-graduation-cap me-2"></i>{{ current_user.formation.nom if current_user.formation else 'Formation non définie' }}</span>
+                    {% if current_user.td_group %}<span><i class="fas fa-users me-2"></i>TD {{ current_user.td_group }}</span>{% endif %}
+                    {% if current_user.tp_group %}<span><i class="fas fa-flask me-2"></i>TP {{ current_user.tp_group }}</span>{% endif %}
+                </div>
+            </div>
+            <div class="col-auto text-end">
+                <div class="d-flex gap-2">
+                    <a href="{{ url_for('student.export_pdf_planning') }}" class="btn btn-white btn-sm px-3 shadow-sm no-print">
+                        <i class="fas fa-file-pdf text-danger me-2"></i>PDF
+                    </a>
+                    <a href="{{ url_for('student.dashboard') }}" class="btn btn-white btn-sm px-3 shadow-sm no-print">
+                        <i class="fas fa-cog text-secondary me-2"></i>Profil
+                    </a>
+                </div>
+            </div>
         </div>
-    </div>
-    <div class="col-md-4 text-md-end mt-3 mt-md-0 no-print">
-        <button onclick="window.print()" class="btn btn-outline-light">
-            <i class="fas fa-print me-2"></i>Imprimer
-        </button>
-        <a href="{{ url_for('student.dashboard') }}" class="btn btn-primary ms-2 shadow-sm">
-            <i class="fas fa-cog me-1"></i> Changer mes groupes
-        </a>
     </div>
 </div>
 
-<div class="glass-card mb-4 min-vh-75">
-    {% for d in dates %}
-    <div class="mb-5 last-child-mb-0">
-        <h5 class="text-primary fw-bold mb-4 border-bottom border-primary border-opacity-25 pb-2">
-            <i class="fas fa-calendar-day me-2"></i> {{ d.strftime('%A %d %B %Y') }}
-        </h5>
-        
-        <div class="row g-3">
-            {% for t in creneaux %}
-                {% if grid_data[d] and grid_data[d][t] %}
-                    {% set s = grid_data[d][t] %}
-                    <div class="col-md-3">
-                        <div class="glass-card p-3 h-100 border-opacity-50 position-relative animate-fade-in
-                            {% if s.type_seance == 'CM' %}bg-primary bg-opacity-20 border-primary
-                            {% elif s.type_seance == 'TD' %}bg-success bg-opacity-20 border-success
-                            {% else %}bg-warning bg-opacity-20 border-warning{% endif %}">
-                            
-                            <div class="d-flex justify-content-between align-items-center mb-2">
-                                <span class="badge {% if s.type_seance == 'CM' %}bg-primary{% elif s.type_seance == 'TD' %}bg-success{% else %}bg-warning text-dark{% endif %}">
-                                    {{ s.type_seance }}
-                                </span>
-                                <span class="small fw-bold"><i class="far fa-clock me-1"></i>{{ s.heure_debut.strftime('%H:%M') }} - {{ s.heure_fin.strftime('%H:%M') }}</span>
-                            </div>
-                            
-                            <h6 class="fw-bold mb-1">{{ s.module.code }}</h6>
-                            <div class="small mb-2 text-muted">{{ s.module.libelle }}</div>
-                            <hr class="my-2 border-white border-opacity-10">
-                            
-                            <div class="small d-flex align-items-center">
-                                <i class="fas fa-user-tie me-2 opacity-50"></i>
-                                <span>{{ s.enseignant.nom_complet() if s.enseignant else 'N/A' }}</span>
-                            </div>
-                            <div class="small mt-1 d-flex align-items-center">
-                                <i class="fas fa-users me-2 opacity-50"></i>
-                                <span class="fw-bold me-3">{{ s.groupe }}</span>
-                                <i class="fas fa-door-open me-2 opacity-50 ms-auto"></i>
-                                <span class="fw-bold">{{ s.salle.nom if s.salle else 'N/A' }}</span>
-                            </div>
+<div class="row g-4">
+    <div class="col-lg-12">
+        <!-- Navigation Semaine -->
+        <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 p-3 data-card border-0 shadow-sm no-print gap-3">
+            <div class="d-flex align-items-center gap-2">
+                <a href="{{ url_for('student.planning', date=prev_week, view=view_mode) }}" class="btn btn-secondary btn-sm rounded-circle shadow-none" style="width: 32px; height: 32px; padding:0;">
+                    <i class="fas fa-chevron-left x-small"></i>
+                </a>
+                <div class="px-3 py-1 bg-light rounded-pill border small fw-800 text-primary">
+                    Semaine du {{ lundi.strftime('%d/%m') }} au {{ samedi.strftime('%d/%m/%Y') }}
+                </div>
+                <a href="{{ url_for('student.planning', date=next_week, view=view_mode) }}" class="btn btn-secondary btn-sm rounded-circle shadow-none" style="width: 32px; height: 32px; padding:0;">
+                    <i class="fas fa-chevron-right x-small"></i>
+                </a>
+            </div>
+            
+            <div class="d-flex align-items-center gap-3">
+                <a href="{{ url_for('student.planning', date=today_str, view=view_mode) }}" class="btn btn-sm btn-outline-primary rounded-pill px-3 fw-800 x-small">
+                    Aujourd'hui
+                </a>
+                <div class="btn-group rounded-pill overflow-hidden shadow-sm border">
+                    <a href="{{ url_for('student.planning', date=lundi.strftime('%Y-%m-%d'), view='grid') }}" class="btn btn-sm {% if view_mode == 'grid' %}btn-primary{% else %}btn-white{% endif %} px-3">
+                        <i class="fas fa-th-large"></i>
+                    </a>
+                    <a href="{{ url_for('student.planning', date=lundi.strftime('%Y-%m-%d'), view='list') }}" class="btn btn-sm {% if view_mode == 'list' %}btn-primary{% else %}btn-white{% endif %} px-3">
+                        <i class="fas fa-list"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="data-card border-0 shadow-lg animate-fade-in p-4">
+            {% if not grid_data %}
+            <div class="text-center py-5">
+                <div class="bg-light text-muted rounded-circle mx-auto mb-4 d-flex align-items-center justify-content-center" style="width: 80px; height: 80px;">
+                    <i class="fas fa-calendar-times fa-2x opacity-25"></i>
+                </div>
+                <h5 class="fw-800 text-dark">Aucun cours cette semaine</h5>
+                <p class="text-muted">Votre planning est vide pour cette période. Profitez de ce temps libre !</p>
+            </div>
+            {% else %}
+                {% if view_mode == 'grid' %}
+                <!-- VUE GRILLE -->
+                <div class="planning-grid-container border-0 shadow-none">
+                    <table class="planning-table w-100 text-center">
+                        <thead>
+                            <tr>
+                                <th class="time-col">Heure</th>
+                                {% for d in jours_semaine %}
+                                <th class="py-3">
+                                    <div class="small fw-800 text-dark text-capitalize">{{ d.strftime('%A') }}</div>
+                                    <div class="x-small text-muted fw-600">{{ d.strftime('%d/%m') }}</div>
+                                </th>
+                                {% endfor %}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for t in creneaux %}
+                            <tr>
+                                <td class="time-col small fw-800 text-primary">
+                                    {{ t.strftime('%H:%M') }}
+                                </td>
+                                {% for d in jours_semaine %}
+                                <td class="p-1 align-top" style="height: 120px;">
+                                    {% if grid_data[d] and grid_data[d][t] %}
+                                        {% set s = grid_data[d][t] %}
+                                        {% set s_type = s.type_seance.lower() %}
+                                        <div class="seance-card seance-{{ s_type }} p-2 h-100 d-flex flex-column text-start border-0 shadow-sm">
+                                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                                <span class="badge {% if s.type_seance == 'CM' %}bg-primary{% elif s.type_seance == 'TD' %}bg-success{% else %}bg-warning text-dark{% endif %}" style="font-size: 0.55rem; padding: 0.2rem 0.5rem;">
+                                                    {{ s.type_seance }}
+                                                </span>
+                                                <span class="x-small fw-800 opacity-75">{{ s.heure_debut.strftime('%H:%M') }}</span>
+                                            </div>
+                                            <div class="fw-800 text-dark small mb-1 lh-sm">{{ s.module.code }}</div>
+                                            <div class="x-small text-muted fw-600 mb-2 lh-sm opacity-75">
+                                                <i class="fas fa-user-tie me-1"></i>{{ s.enseignant.nom if s.enseignant else 'TBA' }}
+                                            </div>
+                                            <div class="mt-auto pt-1 border-top border-dark border-opacity-5 d-flex align-items-center justify-content-between">
+                                                <span class="x-small fw-800"><i class="fas fa-door-open me-1 opacity-50"></i>{{ s.salle.nom if s.salle else 'N/A' }}</span>
+                                                <span class="x-small opacity-50">{{ s.duree }}h</span>
+                                            </div>
+                                        </div>
+                                    {% endif %}
+                                </td>
+                                {% endfor %}
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <!-- VUE LISTE -->
+                <div class="pe-2">
+                {% for day in jours_semaine %}
+                    {% if grid_data[day] %}
+                        {% set is_today_check = (day == now_date if now_date else false) %}
+                        <div class="d-flex align-items-center gap-3 mb-3 mt-4">
+                            <h6 class="fw-800 m-0 text-dark text-capitalize">{{ day.strftime('%A %d %B') }}</h6>
+                            <div class="flex-grow-1 border-bottom"></div>
+                            {% if is_today_check %}<span class="badge bg-primary px-3">Aujourd'hui</span>{% endif %}
                         </div>
-                    </div>
+                        <div class="d-flex flex-column gap-3 mb-5">
+                        {% for t in creneaux %}
+                            {% if grid_data[day] and grid_data[day][t] %}
+                                {% set s = grid_data[day][t] %}
+                                <div class="data-card p-3 border-0 shadow-sm border-start border-4 {% if s.type_seance == 'CM' %}border-primary{% elif s.type_seance == 'TD' %}border-success{% else %}border-warning{% endif %} d-flex align-items-center gap-4 hover-lift">
+                                    <div class="text-center px-2 border-end" style="min-width: 80px;">
+                                        <div class="fw-800 text-dark">{{ s.heure_debut.strftime('%H:%M') }}</div>
+                                        <div class="x-small text-muted">{{ s.heure_fin.strftime('%H:%M') }}</div>
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <div class="d-flex align-items-center gap-2 mb-1">
+                                            <span class="badge {% if s.type_seance == 'CM' %}bg-primary-light text-primary{% elif s.type_seance == 'TD' %}bg-success-light text-success{% else %}bg-warning-light text-warning{% endif %} py-1 px-2" style="font-size: 0.6rem;">{{ s.type_seance }}</span>
+                                            <h6 class="fw-800 m-0 small text-dark">{{ s.module.libelle }}</h6>
+                                        </div>
+                                        <div class="d-flex gap-4 x-small text-muted fw-600">
+                                            <span><i class="fas fa-user-tie me-2 opacity-50"></i>{{ s.enseignant.nom_complet() if s.enseignant else 'Enseignant à définir' }}</span>
+                                            <span><i class="fas fa-door-open me-2 opacity-50"></i>{{ s.salle.nom if s.salle else 'Salle à définir' }}</span>
+                                        </div>
+                                    </div>
+                                    <div class="text-end">
+                                        <div class="fw-800 text-primary small">{{ s.duree }}h</div>
+                                    </div>
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                        </div>
+                    {% endif %}
+                {% endfor %}
+                </div>
                 {% endif %}
-            {% endfor %}
+            {% endif %}
         </div>
     </div>
-    {% else %}
-    <div class="text-center py-5 text-muted">
-        <i class="fas fa-calendar-times fa-4x mb-4 opacity-25"></i>
-        <h4 class="fw-bold">Aucune séance à afficher</h4>
-        <p>Revenez plus tard pour consulter les mises à jour de votre emploi du temps.</p>
-    </div>
-    {% endfor %}
 </div>
 
 <style>
-.last-child-mb-0:last-child { margin-bottom: 0 !important; }
-@media print {
-    body { background: white !important; color: black !important; }
-    .navbar, .btn, .no-print, .btn-secondary { display: none !important; }
-    .glass-card { 
-        background: white !important; 
-        border: 1px solid #ddd !important; 
-        box-shadow: none !important; 
-        backdrop-filter: none !important;
-        color: black !important;
-    }
-    .text-primary { color: #000 !important; }
-    .badge { border: 1px solid #000 !important; background: transparent !important; color: #000 !important; }
-}
+.btn-white { background: white; color: var(--text-secondary); border: 1px solid var(--border); }
+.btn-white:hover { background: var(--bg-body); color: var(--primary); }
+.min-vh-0 { min-height: 0 !important; }
 </style>
 {% endblock %}

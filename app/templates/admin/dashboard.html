@@ -1,65 +1,179 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="row mb-5">
-    <div class="col-12">
-        <h2 class="fw-bold mb-4">Tableau de Bord</h2>
+<div class="row mb-5 align-items-center">
+    <div class="col-md-8">
+        <h2 class="fw-800 mb-1">Tableau de Bord</h2>
+        <p class="text-muted">Vue d'ensemble de l'activité académique et des alertes de planification.</p>
     </div>
-    
-    <!-- Cartes de Statistiques -->
-    <div class="col-md-3 mb-4">
-        <div class="glass-card text-center p-4">
-            <h4 class="text-muted small text-uppercase">Formations</h4>
-            <p class="display-6 fw-bold text-primary">{{ stats.formations_count }}</p>
+    <div class="col-md-4 text-md-end">
+        <div class="bg-white d-inline-flex p-2 rounded-pill shadow-sm border">
+            <span class="px-3 small fw-700 text-primary"><i class="fas fa-clock me-2"></i>{{ now.strftime('%d %B %Y') if now else 'Aujourd\'hui' }}</span>
         </div>
     </div>
-    <div class="col-md-3 mb-4">
-        <div class="glass-card text-center p-4">
-            <h4 class="text-muted small text-uppercase">Modules</h4>
-            <p class="display-6 fw-bold text-secondary">{{ stats.modules_count }}</p>
+</div>
+
+<!-- Cartes de Statistiques -->
+<div class="row mb-4">
+    <div class="col-md-3 col-sm-6 mb-4">
+        <div class="kpi-card hover-lift">
+            <div class="kpi-icon bg-primary-light text-primary">
+                <i class="fas fa-graduation-cap"></i>
+            </div>
+            <div class="kpi-value">{{ stats.formations_count }}</div>
+            <div class="kpi-label">Formations</div>
         </div>
     </div>
-    <div class="col-md-3 mb-4">
-        <div class="glass-card text-center p-4">
-            <h4 class="text-muted small text-uppercase">Enseignants</h4>
-            <p class="display-6 fw-bold text-info">{{ stats.enseignants_count }}</p>
+    <div class="col-md-3 col-sm-6 mb-4">
+        <div class="kpi-card hover-lift">
+            <div class="kpi-icon bg-accent-light text-accent">
+                <i class="fas fa-book"></i>
+            </div>
+            <div class="kpi-value">{{ stats.modules_count }}</div>
+            <div class="kpi-label">Modules</div>
         </div>
     </div>
-    <div class="col-md-3 mb-4">
-        <div class="glass-card text-center p-4">
-            <h4 class="text-muted small text-uppercase">Séances</h4>
-            <p class="display-6 fw-bold text-warning">{{ stats.seances_count }}</p>
+    <div class="col-md-3 col-sm-6 mb-4">
+        <div class="kpi-card hover-lift">
+            <div class="kpi-icon bg-info-light text-info">
+                <i class="fas fa-user-tie"></i>
+            </div>
+            <div class="kpi-value">{{ stats.enseignants_count }}</div>
+            <div class="kpi-label">Enseignants</div>
+        </div>
+    </div>
+    <div class="col-md-3 col-sm-6 mb-4">
+        <div class="kpi-card hover-lift">
+            <div class="kpi-icon bg-warning-light text-warning">
+                <i class="fas fa-calendar-alt"></i>
+            </div>
+            <div class="kpi-value">{{ stats.seances_count }}</div>
+            <div class="kpi-label">Séances</div>
         </div>
     </div>
 </div>
 
 <div class="row">
-    <div class="col-lg-8 mb-4">
-        <div class="glass-card h-100">
-            <h5 class="fw-bold mb-4"><i class="fas fa-tasks me-2"></i> Actions Rapides</h5>
+    <!-- Actions Rapides -->
+    <div class="col-lg-7 mb-4">
+        <div class="data-card h-100 border-0 shadow-lg">
+            <h5 class="fw-800 mb-4 d-flex align-items-center">
+                <span class="bg-primary text-white rounded-2 p-2 me-3" style="width: 35px; height: 35px; display: inline-flex; align-items: center; justify-content: center;">
+                    <i class="fas fa-rocket fa-xs"></i>
+                </span>
+                Actions Rapides
+            </h5>
             <div class="row g-3">
-                <div class="col-6 col-md-4">
-                    <a href="{{ url_for('admin.planning') }}" class="btn btn-outline-light w-100 py-3 text-start">
-                        <i class="fas fa-calendar-plus mb-2 d-xl-block"></i> Planifier une séance
+                <div class="col-6 col-sm-4">
+                    <a href="{{ url_for('admin.planning') }}" class="action-btn-dashboard text-decoration-none">
+                        <i class="fas fa-calendar-plus text-primary"></i> 
+                        <span class="fw-700 small">Planifier</span>
+                        <span class="x-small text-muted mt-1 opacity-75">Nouvelle séance</span>
                     </a>
                 </div>
-                <div class="col-6 col-md-4">
-                    <a href="{{ url_for('admin.modules') }}" class="btn btn-outline-light w-100 py-3 text-start">
-                        <i class="fas fa-book mb-2 d-xl-block"></i> Gérer la maquette
+                <div class="col-6 col-sm-4">
+                    <a href="{{ url_for('admin.modules') }}" class="action-btn-dashboard text-decoration-none">
+                        <i class="fas fa-folder-plus text-accent"></i>
+                        <span class="fw-700 small">Maquette</span>
+                        <span class="x-small text-muted mt-1 opacity-75">Gérer les modules</span>
                     </a>
                 </div>
-                <div class="col-6 col-md-4">
-                    <a href="{{ url_for('admin.enseignants') }}" class="btn btn-outline-light w-100 py-3 text-start">
-                        <i class="fas fa-users-cog mb-2 d-xl-block"></i> Affecter des heures
+                <div class="col-6 col-sm-4">
+                    <a href="{{ url_for('admin.enseignants') }}" class="action-btn-dashboard text-decoration-none">
+                        <i class="fas fa-user-plus text-info"></i>
+                        <span class="fw-700 small">Affecter</span>
+                        <span class="x-small text-muted mt-1 opacity-75">Heures de cours</span>
                     </a>
                 </div>
             </div>
         </div>
     </div>
-    <div class="col-lg-4 mb-4">
-        <div class="glass-card h-100">
-            <h5 class="fw-bold mb-4"><i class="fas fa-bell me-2"></i> Notifications</h5>
-            <p class="text-muted small">Aucune alerte pour le moment. Votre planification est cohérente avec les maquettes pédagogiques.</p>
+
+    <!-- Alertes -->
+    <div class="col-lg-5 mb-4">
+        <div class="data-card h-100 border-0 shadow-lg d-flex flex-column">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h5 class="fw-800 m-0">
+                    <span class="bg-danger text-white rounded-2 p-2 me-3" style="width: 35px; height: 35px; display: inline-flex; align-items: center; justify-content: center;">
+                        <i class="fas fa-exclamation-triangle fa-xs"></i>
+                    </span>
+                    Alertes
+                </h5>
+                {% if total_alertes > 0 %}
+                <span class="badge bg-danger rounded-pill px-3">{{ total_alertes }}</span>
+                {% else %}
+                <span class="badge bg-success-light text-success rounded-pill px-3"><i class="fas fa-check me-1"></i>OK</span>
+                {% endif %}
+            </div>
+            
+            <div class="flex-grow-1 overflow-auto pe-1" style="max-height: 400px;">
+                {% if total_alertes == 0 %}
+                    <div class="text-center py-5">
+                        <div class="bg-success-light text-success rounded-circle mx-auto mb-3 d-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
+                            <i class="fas fa-check-circle fa-2x"></i>
+                        </div>
+                        <p class="fw-700 text-dark mb-1">Tout est en ordre !</p>
+                        <p class="x-small text-muted">Aucune anomalie détectée dans la planification.</p>
+                    </div>
+                {% else %}
+                    
+                    {% if alertes.formations_sans_seance %}
+                    <div class="alert alert-warning border-0 bg-warning-light mb-3">
+                        <div class="fw-800 small text-warning mb-2"><i class="fas fa-graduation-cap me-2"></i> Formations sans séances</div>
+                        <div class="d-flex flex-wrap gap-2">
+                            {% for f in alertes.formations_sans_seance %}
+                            <a href="{{ url_for('admin.planning', fid=f.id) }}" class="badge bg-white text-warning border border-warning border-opacity-25 text-decoration-none hover-lift">
+                                {{ f.nom }}
+                            </a>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    {% if alertes.seances_sans_enseignant %}
+                    <div class="alert alert-danger border-0 bg-danger-light mb-3">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div class="fw-800 small text-danger"><i class="fas fa-user-times me-2"></i> Séances sans enseignant ({{ alertes.seances_sans_enseignant|length }})</div>
+                            <a href="{{ url_for('admin.planning') }}" class="btn btn-danger btn-sm rounded-pill px-3 x-small fw-bold shadow-none">Réparer</a>
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    {% if alertes.seances_sans_salle %}
+                    <div class="alert alert-warning border-0 bg-warning-light mb-3">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div class="fw-800 small text-warning"><i class="fas fa-door-open me-2"></i> Séances sans salle ({{ alertes.seances_sans_salle|length }})</div>
+                            <a href="{{ url_for('admin.planning') }}" class="btn btn-warning btn-sm rounded-pill px-3 x-small fw-bold shadow-none">Allouer</a>
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    {% if alertes.enseignants_surcharge %}
+                    <div class="alert alert-danger border-0 bg-danger-light mb-3">
+                        <div class="fw-800 small text-danger mb-2"><i class="fas fa-user-clock me-2"></i> Surcharges détectées</div>
+                        <ul class="mb-0 ps-3 x-small fw-600 text-danger opacity-75">
+                            {% for e in alertes.enseignants_surcharge %}
+                            <li>{{ e.enseignant.nom }} (+{{ e.depassement }}h)</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    {% endif %}
+                    
+                    {% if alertes.modules_sans_affectation %}
+                    <div class="alert alert-danger border-0 bg-danger-light mb-3">
+                        <div class="fw-800 small text-danger mb-2"><i class="fas fa-user-slash me-2"></i> Modules orphelins</div>
+                        <div class="d-flex flex-wrap gap-2">
+                            {% for m in alertes.modules_sans_affectation %}
+                            <a href="{{ url_for('admin.enseignants') }}" class="badge bg-white text-danger border border-danger border-opacity-25 text-decoration-none hover-lift">
+                                {{ m.code }}
+                            </a>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                {% endif %}
+            </div>
         </div>
     </div>
 </div>

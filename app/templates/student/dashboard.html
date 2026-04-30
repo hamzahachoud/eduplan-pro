@@ -2,25 +2,36 @@
 
 {% block content %}
 <div class="row">
-    <div class="col-12 mb-4">
-        <h2 class="fw-bold">Bienvenue, {{ current_user.email }}</h2>
-        <p class="text-muted">Veuillez sélectionner votre groupe pour consulter votre emploi du temps.</p>
+    <div class="col-12 mb-5 animate-fade-in text-center">
+        <h2 class="fw-800 mb-2">Bienvenue sur votre Espace</h2>
+        <p class="text-muted">Bonjour <span class="text-primary fw-700">{{ current_user.email }}</span>, configurez vos
+            groupes pour afficher votre emploi du temps personnalisé.</p>
     </div>
-    
+
     {% if formations %}
     <div class="col-lg-6 mx-auto">
-        <div class="glass-card animate-fade-in">
-            <div class="text-center mb-4">
-                <i class="fas fa-id-card fa-3x text-primary mb-3"></i>
-                <h3 class="fw-bold">Configuration du Profil</h3>
-                <p class="text-muted small">Personnalisez votre emploi du temps en quelques secondes.</p>
+        <div class="data-card animate-slide-up shadow-xl border-0 p-5">
+            <div class="text-center mb-5">
+                <div class="bg-primary-light text-primary mx-auto mb-4 d-flex align-items-center justify-content-center shadow-sm"
+                    style="width: 80px; height: 80px; border-radius: 24px;">
+                    <i class="fas fa-sliders-h fa-2x"></i>
+                </div>
+                <h4 class="fw-800 text-dark">Configuration du Profil</h4>
+                <p class="text-muted small">Sélectionnez vos groupes pour filtrer le planning global.</p>
             </div>
 
             <form action="{{ url_for('student.setup_groups') }}" method="POST">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
                 <!-- ÉTAPE 1 : FORMATION -->
                 <div class="mb-4">
-                    <label class="form-label text-muted small text-uppercase fw-bold"><i class="fas fa-graduation-cap me-2"></i>Votre Formation</label>
-                    <select id="formation_select" name="formation_id" class="form-select form-select-lg bg-dark bg-opacity-20 text-white border-0 shadow-sm" required onchange="updateGroups()">
+                    <label class="form-label d-flex align-items-center">
+                        <span class="bg-primary-light text-primary rounded-circle p-1 me-2"
+                            style="width: 24px; height: 24px; display: inline-flex; align-items: center; justify-content: center; font-size: 0.7rem;">1</span>
+                        Votre Formation
+                    </label>
+                    <select id="formation_select" name="formation_id"
+                        class="form-select form-select-lg py-3 shadow-none border-2" required onchange="updateGroups()">
                         <option value="" disabled selected>-- Quelle est votre formation ? --</option>
                         {% for f in formations %}
                         <option value="{{ f.id }}" data-td="{{ f.nb_groupes_td }}" data-tp="{{ f.nb_groupes_tp }}">
@@ -30,67 +41,94 @@
                     </select>
                 </div>
 
-                <!-- ÉTAPE 2 : GROUPES (Masqués par défaut) -->
+                <!-- ÉTAPE 2 : GROUPES -->
                 <div id="groups_section" style="display: none;" class="animate-fade-in">
-                    <div class="mb-4">
-                        <label class="form-label text-muted small text-uppercase fw-bold"><i class="fas fa-users me-2"></i>Groupe de TD</label>
-                        <select id="td_select" name="td_group" class="form-select bg-dark bg-opacity-20 text-white border-0" required>
-                            <option value="">Sélectionnez d'abord une formation</option>
-                        </select>
+                    <div class="row g-3 mb-5">
+                        <div class="col-md-6">
+                            <label class="form-label d-flex align-items-center">
+                                <span class="bg-accent-light text-accent rounded-circle p-1 me-2"
+                                    style="width: 24px; height: 24px; display: inline-flex; align-items: center; justify-content: center; font-size: 0.7rem;">2</span>
+                                Groupe de TD
+                            </label>
+                            <select id="td_select" name="td_group" class="form-select py-3 shadow-none border-2"
+                                required>
+                                <option value="">Choisir TD</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label d-flex align-items-center">
+                                <span class="bg-success-light text-success rounded-circle p-1 me-2"
+                                    style="width: 24px; height: 24px; display: inline-flex; align-items: center; justify-content: center; font-size: 0.7rem;">3</span>
+                                Groupe de TP
+                            </label>
+                            <select id="tp_select" name="tp_group" class="form-select py-3 shadow-none border-2"
+                                required>
+                                <option value="">Choisir TP</option>
+                            </select>
+                        </div>
                     </div>
 
-                    <div class="mb-4">
-                        <label class="form-label text-muted small text-uppercase fw-bold"><i class="fas fa-vial me-2"></i>Groupe de TP</label>
-                        <select id="tp_select" name="tp_group" class="form-select bg-dark bg-opacity-20 text-white border-0" required>
-                            <option value="">Sélectionnez d'abord une formation</option>
-                        </select>
-                    </div>
-
-                    <button type="submit" class="btn btn-primary btn-lg w-100 shadow mt-2">
-                        <i class="fas fa-calendar-check me-2"></i>Générer mon planning
+                    <button type="submit" class="btn btn-primary btn-lg w-100 shadow-sm py-3 fw-800">
+                        Accéder à mon planning <i class="fas fa-calendar-check ms-2"></i>
                     </button>
                 </div>
             </form>
         </div>
+
+        <div class="mt-4 text-center animate-fade-in" style="animation-delay: 0.4s;">
+            <p class="text-muted x-small"><i class="fas fa-info-circle me-2"></i>Ces paramètres ne seront pas mémorisés
+                pour vos prochaines visites.</p>
+        </div>
     </div>
 
     <script>
-    function updateGroups() {
-        const select = document.getElementById('formation_select');
-        const option = select.options[select.selectedIndex];
-        const nbTD = parseInt(option.getAttribute('data-td'));
-        const nbTP = parseInt(option.getAttribute('data-tp'));
-        
-        const tdSelect = document.getElementById('td_select');
-        const tpSelect = document.getElementById('tp_select');
-        const groupsSection = document.getElementById('groups_section');
+        function updateGroups() {
+            const select = document.getElementById('formation_select');
+            const option = select.options[select.selectedIndex];
+            const nbTD = parseInt(option.getAttribute('data-td'));
+            const nbTP = parseInt(option.getAttribute('data-tp'));
 
-        // Reset
-        tdSelect.innerHTML = '<option value="" disabled selected>Choisir TD</option>';
-        tpSelect.innerHTML = '<option value="" disabled selected>Choisir TP</option>';
+            const tdSelect = document.getElementById('td_select');
+            const tpSelect = document.getElementById('tp_select');
+            const groupsSection = document.getElementById('groups_section');
 
-        // Fill TD
-        for (let i = 1; i <= nbTD; i++) {
-            tdSelect.innerHTML += `<option value="TD${i}">Groupe TD ${i}</option>`;
+            // Reset
+            tdSelect.innerHTML = '<option value="" disabled selected>Choisir TD</option>';
+            tpSelect.innerHTML = '<option value="" disabled selected>Choisir TP</option>';
+
+            // Fill TD
+            for (let i = 1; i <= nbTD; i++) {
+                tdSelect.innerHTML += `<option value="TD${i}">Groupe TD ${i}</option>`;
+            }
+
+            // Fill TP
+            const nbTpPerTd = Math.floor(nbTP / nbTD);
+            for (let i = 1; i <= nbTP; i++) {
+                const tdNum = Math.floor((i - 1) / nbTpPerTd) + 1;
+                const suffix = nbTpPerTd > 1 ? String.fromCharCode(65 + (i - 1) % nbTpPerTd) : "";
+                const tpName = `TP${tdNum}${suffix}`;
+                tpSelect.innerHTML += `<option value="${tpName}">Groupe ${tpName}</option>`;
+            }
+
+            // Show section with animation
+            groupsSection.style.display = 'block';
+            select.classList.remove('border-2');
+            select.classList.add('border-primary');
         }
-
-        // Fill TP
-        const nbTpPerTd = Math.floor(nbTP / nbTD);
-        for (let i = 1; i <= nbTP; i++) {
-            const tdNum = Math.floor((i-1) / nbTpPerTd) + 1;
-            const suffix = nbTpPerTd > 1 ? String.fromCharCode(65 + (i-1) % nbTpPerTd) : "";
-            const tpName = `TP${tdNum}${suffix}`;
-            tpSelect.innerHTML += `<option value="${tpName}">Groupe ${tpName}</option>`;
-        }
-
-        // Show section
-        groupsSection.style.display = 'block';
-    }
     </script>
     {% else %}
-    <div class="col-12 text-center py-5 glass-card">
-        <i class="fas fa-hourglass-start fa-3x text-muted mb-3"></i>
-        <p class="text-muted">Aucune formation disponible pour le moment.</p>
+    <div class="col-lg-6 mx-auto">
+        <div class="data-card text-center py-5 border-0 shadow-lg">
+            <div class="bg-light text-muted rounded-circle mx-auto mb-4 d-flex align-items-center justify-content-center"
+                style="width: 100px; height: 100px;">
+                <i class="fas fa-hourglass-start fa-3x opacity-25"></i>
+            </div>
+            <h5 class="fw-800 text-dark">Aucune formation disponible</h5>
+            <p class="text-muted px-4">L'administration n'a pas encore configuré les formations pour ce semestre.
+                Veuillez revenir plus tard.</p>
+            <a href="{{ url_for('student.index') }}" class="btn btn-secondary rounded-pill px-4 mt-3">Retour à
+                l'accueil</a>
+        </div>
     </div>
     {% endif %}
 </div>

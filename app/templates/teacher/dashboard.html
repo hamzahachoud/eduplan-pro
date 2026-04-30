@@ -2,34 +2,81 @@
 
 {% block content %}
 <div class="row">
-    <div class="col-12 mb-4">
-        <h2 class="fw-bold">Espace Enseignant : {{ current_user.enseignant.nom_complet() }}</h2>
-        <p class="text-muted">Consultez votre emploi du temps et gérez vos séances.</p>
+    <div class="col-12 mb-5 animate-fade-in">
+        <div class="d-flex align-items-center gap-4">
+            <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center shadow-lg fw-800 fs-3" style="width: 70px; height: 70px;">
+                {{ current_user.enseignant.prenom[0].upper() if current_user.enseignant.prenom else 'P' }}
+            </div>
+            <div>
+                <h2 class="fw-800 mb-1">Espace Enseignant</h2>
+                <p class="text-muted">Bonjour <span class="text-primary fw-700">{{ current_user.enseignant.nom_complet() }}</span>, ravi de vous revoir sur votre portail.</p>
+            </div>
+        </div>
     </div>
     
     <div class="col-lg-4 mb-4">
-        <div class="glass-card animate-fade-in h-100">
-            <div class="text-center py-4">
-                <i class="fas fa-calendar-alt fa-4x text-primary mb-3"></i>
-                <h3 class="fw-bold">{{ seances_futures }}</h3>
-                <p class="text-muted">Séances à venir</p>
-                <a href="{{ url_for('teacher.planning') }}" class="btn btn-primary w-100 mt-3">
-                    <i class="fas fa-eye me-2"></i>Voir mon planning
-                </a>
+        <div class="data-card border-0 shadow-xl animate-fade-in h-100 d-flex flex-column justify-content-center align-items-center text-center p-5">
+            <div class="bg-primary-light text-primary rounded-circle mb-4 d-flex align-items-center justify-content-center shadow-sm" style="width: 80px; height: 80px;">
+                <i class="fas fa-calendar-check fa-2x"></i>
             </div>
+            <h1 class="display-4 fw-800 text-dark mb-2">{{ seances_futures }}</h1>
+            <p class="text-muted text-uppercase x-small fw-800 ls-1 mb-5">Séances à venir</p>
+            <a href="{{ url_for('teacher.planning') }}" class="btn btn-primary w-100 py-3 fw-800 shadow-sm">
+                <i class="fas fa-calendar-alt me-2"></i>Consulter mon planning
+            </a>
         </div>
     </div>
     
     <div class="col-lg-8">
-        <div class="glass-card animate-fade-in" style="animation-delay: 0.2s;">
-            <h5 class="fw-bold mb-4"><i class="fas fa-info-circle me-2"></i>Informations</h5>
-            <div class="alert alert-info bg-opacity-10 border-info text-white">
-                <i class="fas fa-lightbulb me-2"></i>
-                Bienvenue dans votre nouvel espace dédié. Vous pouvez voir ici toutes les séances qui vous ont été attribuées par l'administration.
+        <div class="data-card border-0 shadow-xl animate-fade-in h-100 p-5" style="animation-delay: 0.2s;">
+            <div class="d-flex align-items-center mb-5">
+                <div class="bg-accent-light text-accent rounded-3 p-2 me-3" style="width: 40px; height: 40px; display: inline-flex; align-items: center; justify-content: center;">
+                    <i class="fas fa-user-circle"></i>
+                </div>
+                <h5 class="fw-800 m-0 text-dark">Mon Profil Professionnel</h5>
             </div>
-            <p>Votre profil est lié à : <strong>{{ current_user.enseignant.nom_complet() }}</strong></p>
-            <p>Email : <code>{{ current_user.email }}</code></p>
+            
+            <div class="p-4 rounded-3 bg-light border-0 mb-5">
+                <div class="row align-items-center">
+                    <div class="col-auto">
+                        <div class="rounded-circle bg-white shadow-sm d-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
+                            <i class="fas fa-id-card text-primary fa-xl"></i>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <h6 class="fw-800 mb-1 text-dark">{{ current_user.enseignant.nom_complet() }}</h6>
+                        <p class="text-muted small mb-0 fw-600">{{ current_user.email }}</p>
+                    </div>
+                    <div class="col-auto">
+                        <span class="badge bg-primary-light text-primary px-3 py-2 fw-800">Intervenant</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-info-light border-start border-info border-4 p-4 rounded-3 mb-4">
+                <div class="d-flex gap-4">
+                    <i class="fas fa-info-circle fa-2x text-info opacity-50"></i>
+                    <div>
+                        <h6 class="fw-800 text-info">Information de Planification</h6>
+                        <p class="mb-0 small text-dark fw-600 opacity-75">Bienvenue dans votre nouvel espace. Vous pouvez visualiser l'ensemble des séances qui vous ont été attribuées. En cas d'erreur dans votre planning, veuillez contacter le service scolarité.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mt-5 pt-4 border-top">
+                <div class="d-flex justify-content-between align-items-center">
+                    <p class="text-muted small m-0 fw-600"><i class="fas fa-clock me-2"></i>Dernière connexion : <span class="text-dark fw-800">{{ current_user.last_login.strftime('%d/%m/%Y à %H:%M') if current_user.last_login else 'Première connexion' }}</span></p>
+                    <a href="{{ url_for('admin.logout') }}" class="btn btn-white btn-sm px-3 shadow-sm text-danger fw-800">
+                        <i class="fas fa-sign-out-alt me-2"></i>Déconnexion
+                    </a>
+                </div>
+            </div>
         </div>
     </div>
 </div>
+
+<style>
+.btn-white { background: white; color: var(--text-secondary); border: 1px solid var(--border); }
+.btn-white:hover { background: var(--bg-body); color: var(--danger); border-color: var(--danger); }
+</style>
 {% endblock %}

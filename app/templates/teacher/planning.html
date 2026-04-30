@@ -1,212 +1,266 @@
 {% extends "base.html" %}
-{% block extra_css %}
-<style>
-/* ─── LAYOUT PROF ───────────────────────────────────────────── */
-.prof-header{
-    background:linear-gradient(135deg,rgba(99,102,241,.18),rgba(168,85,247,.18));
-    border:1px solid rgba(99,102,241,.35);
-    border-radius:20px;padding:1.8rem 2rem;margin-bottom:1.5rem;
-}
-.avatar{
-    width:54px;height:54px;border-radius:50%;flex-shrink:0;
-    background:linear-gradient(135deg,#6366f1,#a855f7);
-    display:flex;align-items:center;justify-content:center;
-    font-size:1.4rem;font-weight:800;color:#fff;
-}
-/* ─── KPI CARDS ─────────────────────────────────────────────── */
-.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:.9rem;margin-bottom:1.5rem;}
-.kpi{
-    background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);
-    border-radius:16px;padding:1.1rem;text-align:center;
-}
-.kpi .kpi-val{font-size:1.7rem;font-weight:800;}
-.kpi .kpi-lbl{font-size:.7rem;text-transform:uppercase;letter-spacing:.08em;color:#94a3b8;margin-top:.2rem;}
-.kpi.accent-blue  .kpi-val{color:#60a5fa;}
-.kpi.accent-green .kpi-val{color:#34d399;}
-.kpi.accent-amber .kpi-val{color:#fbbf24;}
-.kpi.accent-red   .kpi-val{color:#f87171;}
-.kpi.accent-violet.kpi-val{color:#c4b5fd;}
-
-/* ─── SEANCE CARD ────────────────────────────────────────────── */
-.seance-row{
-    display:flex;align-items:center;gap:1rem;
-    background:rgba(255,255,255,.05);
-    border:1px solid rgba(255,255,255,.09);
-    border-radius:14px;padding:1rem 1.2rem;
-    transition:all .2s;
-}
-.seance-row:hover{background:rgba(255,255,255,.09);transform:translateX(3px);}
-.seance-row.is-today{border-left:3px solid #6366f1;}
-.seance-row.is-past {opacity:.4;}
-
-.time-box{
-    min-width:76px;text-align:center;flex-shrink:0;
-    background:rgba(99,102,241,.15);border:1px solid rgba(99,102,241,.3);
-    border-radius:10px;padding:.45rem .6rem;
-}
-.time-box .h-start{font-size:1rem;font-weight:700;}
-.time-box .h-end  {font-size:.65rem;color:#94a3b8;}
-
-.badge-type{padding:.35em 1em;border-radius:8px;font-size:.72rem;font-weight:700;flex-shrink:0;}
-.badge-cm{background:rgba(59,130,246,.15);color:#60a5fa;border:1px solid rgba(59,130,246,.3);}
-.badge-td{background:rgba(16,185,129,.15);color:#34d399;border:1px solid rgba(16,185,129,.3);}
-.badge-tp{background:rgba(245,158,11,.15);color:#fbbf24;border:1px solid rgba(245,158,11,.3);}
-
-.date-sep{
-    font-size:.72rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
-    color:#818cf8;border-bottom:1px solid rgba(255,255,255,.08);
-    padding-bottom:.4rem;margin:1.4rem 0 .7rem;
-}
-.date-sep.today-sep{color:#a5b4fc;}
-
-/* ─── MODULE PROGRESS ────────────────────────────────────────── */
-.mod-row{padding:.9rem 0;border-bottom:1px solid rgba(255,255,255,.07);}
-.mod-row:last-child{border-bottom:none;}
-.prog-bar{height:6px;background:rgba(255,255,255,.08);border-radius:4px;overflow:hidden;margin-top:.4rem;}
-.prog-fill{height:100%;border-radius:4px;background:linear-gradient(90deg,#6366f1,#a855f7);transition:width .6s ease;}
-.prog-fill.over{background:linear-gradient(90deg,#f87171,#ef4444);}
-
-.empty-state{text-align:center;padding:3.5rem;color:#475569;}
-.empty-state i{font-size:2.8rem;margin-bottom:.8rem;}
-</style>
-{% endblock %}
 
 {% block content %}
 {% set today = today %}
 
 {# ── HEADER ─────────────────────────────────────────────────── #}
-<div class="prof-header animate-fade-in">
-  <div class="d-flex align-items-center gap-3">
-    <div class="avatar">{{ enseignant.prenom.strip()[0].upper() if enseignant.prenom.strip() else '?' }}</div>
-    <div class="flex-grow-1">
-      <h5 class="fw-bold mb-0">{{ enseignant.prenom.strip() }} {{ enseignant.nom.strip() }}</h5>
-      <p class="text-muted small mb-0">Enseignant · Tableau de bord personnel</p>
+<div class="data-card border-0 shadow-lg mb-5 animate-fade-in overflow-hidden p-0">
+    <div class="bg-primary p-4 text-white">
+        <div class="row align-items-center">
+            <div class="col-auto">
+                <div class="bg-white text-primary rounded-circle d-flex align-items-center justify-content-center shadow-sm fw-800 fs-4" style="width: 60px; height: 60px;">
+                    {{ enseignant.prenom.strip()[0].upper() if enseignant.prenom.strip() else 'P' }}
+                </div>
+            </div>
+            <div class="col">
+                <h4 class="fw-800 mb-1 text-white">{{ enseignant.prenom.strip() }} {{ enseignant.nom.strip() }}</h4>
+                <p class="small mb-0 opacity-90"><i class="fas fa-id-badge me-2"></i>Intervenant · Dashboard Personnel</p>
+            </div>
+            <div class="col-auto text-end">
+                <div class="d-flex gap-2">
+                    <a href="{{ url_for('teacher.export_pdf_planning') }}" class="btn btn-white btn-sm px-3 shadow-sm no-print">
+                        <i class="fas fa-file-pdf text-danger me-2"></i>PDF
+                    </a>
+                    <a href="{{ url_for('teacher.dashboard') }}" class="btn btn-white btn-sm px-3 shadow-sm no-print">
+                        <i class="fas fa-home text-secondary me-2"></i>Accueil
+                    </a>
+                </div>
+            </div>
+        </div>
     </div>
-    <a href="{{ url_for('admin.logout') }}" class="btn btn-sm btn-outline-danger no-print">
-      <i class="fas fa-sign-out-alt me-1"></i>Déconnexion
-    </a>
-  </div>
 </div>
 
 {# ── KPI ─────────────────────────────────────────────────────── #}
-<div class="kpi-grid animate-fade-in" style="animation-delay:.05s">
-  <div class="kpi accent-blue">
-    <div class="kpi-val">{{ seances_futures }}</div>
-    <div class="kpi-lbl">Séances à venir</div>
-  </div>
-  <div class="kpi accent-green">
-    <div class="kpi-val">{{ seances_semaine }}</div>
-    <div class="kpi-lbl">Cette semaine</div>
-  </div>
-  <div class="kpi accent-violet">
-    <div class="kpi-val">{{ heures_effectuees }}h</div>
-    <div class="kpi-lbl">Heures effectuées</div>
-  </div>
-  <div class="kpi accent-amber">
-    <div class="kpi-val">{{ heures_restantes }}h</div>
-    <div class="kpi-lbl">Heures restantes</div>
-  </div>
-  {% if heures_sup > 0 %}
-  <div class="kpi accent-red">
-    <div class="kpi-val">+{{ heures_sup }}h</div>
-    <div class="kpi-lbl">Heures sup.</div>
-  </div>
-  {% endif %}
+<div class="row mb-5 animate-fade-in" style="animation-delay:.05s">
+    <div class="col-md-3 col-6 mb-4">
+        <div class="kpi-card hover-lift">
+            <div class="kpi-icon bg-info-light text-info"><i class="fas fa-calendar-alt"></i></div>
+            <div class="kpi-value text-dark">{{ seances_futures }}</div>
+            <div class="kpi-label">Séances à venir</div>
+        </div>
+    </div>
+    <div class="col-md-3 col-6 mb-4">
+        <div class="kpi-card hover-lift">
+            <div class="kpi-icon bg-success-light text-success"><i class="fas fa-clock"></i></div>
+            <div class="kpi-value text-dark">{{ seances_semaine }}</div>
+            <div class="kpi-label">Cette semaine</div>
+        </div>
+    </div>
+    <div class="col-md-3 col-6 mb-4">
+        <div class="kpi-card hover-lift">
+            <div class="kpi-icon bg-accent-light text-accent"><i class="fas fa-check-double"></i></div>
+            <div class="kpi-value text-dark">{{ heures_effectuees }}h</div>
+            <div class="kpi-label">Heures effectuées</div>
+        </div>
+    </div>
+    <div class="col-md-3 col-6 mb-4">
+        <div class="kpi-card hover-lift {% if heures_sup > 0 %}border-danger border-opacity-25{% endif %}">
+            <div class="kpi-icon {% if heures_sup > 0 %}bg-danger-light text-danger{% else %}bg-warning-light text-warning{% endif %}">
+                <i class="fas fa-hourglass-half"></i>
+            </div>
+            <div class="kpi-value text-dark">{% if heures_sup > 0 %}+{{ heures_sup }}h{% else %}{{ heures_restantes }}h{% endif %}</div>
+            <div class="kpi-label">{% if heures_sup > 0 %}Heures supplémentaires{% else %}Heures restantes{% endif %}</div>
+        </div>
+    </div>
 </div>
 
 <div class="row g-4">
-
-{# ── PLANNING CHRONOLOGIQUE ─────────────────────────────────── #}
-<div class="col-lg-7">
-  <div class="glass-card animate-fade-in" style="animation-delay:.1s">
-    <div class="d-flex align-items-center justify-content-between mb-3">
-      <h5 class="fw-bold mb-0"><i class="fas fa-calendar-alt me-2"></i>Mon Planning</h5>
-      <span class="badge bg-secondary">{{ seances_total }} séances</span>
-    </div>
-
-    {% if not seances_grouped %}
-    <div class="empty-state">
-      <i class="fas fa-calendar-times d-block text-muted"></i>
-      <h6 class="mt-2">Aucune séance planifiée</h6>
-      <p class="text-muted small mb-0">Vos cours apparaîtront ici une fois ajoutés par l'administration.</p>
-    </div>
-    {% else %}
-      {% for day, seances in seances_grouped.items() %}
-        {% set is_today = (day == today) %}
-        {% set is_past = (day < today) %}
-        <div class="date-sep {% if is_today %}today-sep{% endif %}">
-          {% if is_today %}<i class="fas fa-circle me-1" style="font-size:.45rem;vertical-align:middle;color:#818cf8"></i>AUJOURD'HUI · {% endif %}
-          {{ day.strftime('%A %d %B %Y') | capitalize }}
-        </div>
-        <div class="d-flex flex-column gap-2 mb-1">
-        {% for s in seances %}
-        <div class="seance-row {% if is_today %}is-today{% elif is_past %}is-past{% endif %}">
-          <div class="time-box">
-            <div class="h-start">{{ s.heure_debut.strftime('%H:%M') }}</div>
-            <div class="h-end">{{ s.heure_fin.strftime('%H:%M') }}</div>
-          </div>
-          <span class="badge-type badge-{{ s.type_seance.lower() }}">{{ s.type_seance }}</span>
-          <div class="flex-grow-1 overflow-hidden">
-            <div class="fw-semibold text-truncate">{{ s.module.libelle }}</div>
-            <div class="text-muted small">
-              <i class="fas fa-users me-1"></i>Gr. {{ s.groupe }}
-              {% if s.salle %}&nbsp;·&nbsp;<i class="fas fa-door-open me-1"></i>{{ s.salle.nom }}{% endif %}
-              {% if s.module.formation %}&nbsp;·&nbsp;<i class="fas fa-graduation-cap me-1"></i>{{ s.module.formation.nom }}{% endif %}
+    {# ── PLANNING CHRONOLOGIQUE ─────────────────────────────────── #}
+    <div class="col-lg-7">
+        <!-- Navigation Semaine -->
+        <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 p-3 data-card border-0 shadow-sm no-print gap-3">
+            <div class="d-flex align-items-center gap-2">
+                <a href="{{ url_for('teacher.planning', date=prev_week, view=view_mode) }}" class="btn btn-secondary btn-sm rounded-circle shadow-none" style="width: 32px; height: 32px; padding:0;">
+                    <i class="fas fa-chevron-left x-small"></i>
+                </a>
+                <div class="px-3 py-1 bg-light rounded-pill border small fw-800 text-primary">
+                    Semaine du {{ lundi.strftime('%d/%m') }} au {{ samedi.strftime('%d/%m/%Y') }}
+                </div>
+                <a href="{{ url_for('teacher.planning', date=next_week, view=view_mode) }}" class="btn btn-secondary btn-sm rounded-circle shadow-none" style="width: 32px; height: 32px; padding:0;">
+                    <i class="fas fa-chevron-right x-small"></i>
+                </a>
             </div>
-          </div>
-          <div class="text-muted text-nowrap" style="font-size:.8rem"><i class="fas fa-clock me-1"></i>{{ s.duree }}h</div>
+            
+            <div class="d-flex align-items-center gap-3">
+                <a href="{{ url_for('teacher.planning', date=today_str, view=view_mode) }}" class="btn btn-sm btn-outline-primary rounded-pill px-3 fw-800 x-small">
+                    Aujourd'hui
+                </a>
+                <div class="btn-group rounded-pill overflow-hidden shadow-sm border">
+                    <a href="{{ url_for('teacher.planning', date=lundi.strftime('%Y-%m-%d'), view='grid') }}" class="btn btn-sm {% if view_mode == 'grid' %}btn-primary{% else %}btn-white{% endif %} px-3">
+                        <i class="fas fa-th-large"></i>
+                    </a>
+                    <a href="{{ url_for('teacher.planning', date=lundi.strftime('%Y-%m-%d'), view='list') }}" class="btn btn-sm {% if view_mode == 'list' %}btn-primary{% else %}btn-white{% endif %} px-3">
+                        <i class="fas fa-list"></i>
+                    </a>
+                </div>
+            </div>
         </div>
-        {% endfor %}
+
+        <div class="data-card border-0 shadow-lg animate-fade-in p-4" style="animation-delay:.1s">
+            <div class="d-flex align-items-center justify-content-between mb-4">
+                <h5 class="fw-800 mb-0 text-dark"><i class="fas fa-calendar-alt me-2 text-primary opacity-50"></i> Mon Planning</h5>
+            </div>
+
+            {% if not grid_data %}
+            <div class="text-center py-5">
+                <div class="bg-light text-muted rounded-circle mx-auto mb-4 d-flex align-items-center justify-content-center" style="width: 80px; height: 80px;">
+                    <i class="fas fa-calendar-times fa-2x opacity-25"></i>
+                </div>
+                <h5 class="fw-800 text-dark">Aucune séance cette semaine</h5>
+                <p class="text-muted">Votre emploi du temps est vide pour cette période.</p>
+            </div>
+            {% else %}
+                {% if view_mode == 'grid' %}
+                <!-- VUE GRILLE -->
+                <div class="planning-grid-container border-0 shadow-none">
+                    <table class="planning-table w-100 text-center">
+                        <thead>
+                            <tr>
+                                <th class="time-col">Heure</th>
+                                {% for d in jours_semaine %}
+                                <th class="py-3">
+                                    <div class="small fw-800 text-dark text-capitalize">{{ d.strftime('%A') }}</div>
+                                    <div class="x-small text-muted fw-600">{{ d.strftime('%d/%m') }}</div>
+                                </th>
+                                {% endfor %}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for t in creneaux %}
+                            <tr>
+                                <td class="time-col small fw-800 text-primary">
+                                    {{ t.strftime('%H:%M') }}
+                                </td>
+                                {% for d in jours_semaine %}
+                                <td class="p-1 align-top" style="height: 120px;">
+                                    {% if grid_data[d] and grid_data[d][t] %}
+                                        {% set s = grid_data[d][t] %}
+                                        <div class="seance-card seance-{{ s.type_seance.lower() }} p-2 h-100 d-flex flex-column text-start border-0 shadow-sm">
+                                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                                <span class="badge {% if s.type_seance == 'CM' %}bg-primary{% elif s.type_seance == 'TD' %}bg-success{% else %}bg-warning text-dark{% endif %}" style="font-size: 0.55rem; padding: 0.2rem 0.5rem;">
+                                                    {{ s.type_seance }}
+                                                </span>
+                                                <span class="x-small fw-800 opacity-75">{{ s.heure_debut.strftime('%H:%M') }}</span>
+                                            </div>
+                                            <div class="fw-800 text-dark small mb-1 lh-sm">{{ s.module.code }}</div>
+                                            <div class="x-small text-muted fw-800 mb-2 lh-sm opacity-75">
+                                                Gr. {{ s.groupe }}
+                                            </div>
+                                            <div class="mt-auto pt-1 border-top border-dark border-opacity-5 d-flex align-items-center justify-content-between">
+                                                <span class="x-small fw-800"><i class="fas fa-door-open me-1 opacity-50"></i>{{ s.salle.nom if s.salle else 'N/A' }}</span>
+                                                <span class="x-small opacity-50">{{ s.duree }}h</span>
+                                            </div>
+                                        </div>
+                                    {% endif %}
+                                </td>
+                                {% endfor %}
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <!-- VUE LISTE -->
+                <div class="pe-2">
+                {% for day in jours_semaine %}
+                    {% if grid_data[day] %}
+                        {% set is_today_check = (day == today) %}
+                        <div class="d-flex align-items-center gap-3 mb-3 mt-4">
+                            <h6 class="fw-800 m-0 text-dark text-capitalize">{{ day.strftime('%A %d %B') }}</h6>
+                            <div class="flex-grow-1 border-bottom"></div>
+                            {% if is_today_check %}<span class="badge bg-primary px-3">Aujourd'hui</span>{% endif %}
+                        </div>
+                        <div class="d-flex flex-column gap-3 mb-5">
+                        {% for t in creneaux %}
+                            {% if grid_data[day] and grid_data[day][t] %}
+                                {% set s = grid_data[day][t] %}
+                                <div class="data-card p-3 border-0 shadow-sm border-start border-4 {% if s.type_seance == 'CM' %}border-primary{% elif s.type_seance == 'TD' %}border-success{% else %}border-warning{% endif %} d-flex align-items-center gap-4 hover-lift">
+                                    <div class="text-center px-2 border-end" style="min-width: 80px;">
+                                        <div class="fw-800 text-dark">{{ s.heure_debut.strftime('%H:%M') }}</div>
+                                        <div class="x-small text-muted">{{ s.heure_fin.strftime('%H:%M') }}</div>
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <div class="d-flex align-items-center gap-2 mb-1">
+                                            <span class="badge {% if s.type_seance == 'CM' %}bg-primary-light text-primary{% elif s.type_seance == 'TD' %}bg-success-light text-success{% else %}bg-warning-light text-warning{% endif %} py-1 px-2" style="font-size: 0.6rem;">{{ s.type_seance }}</span>
+                                            <h6 class="fw-800 m-0 small text-dark">{{ s.module.libelle }}</h6>
+                                        </div>
+                                        <div class="d-flex gap-4 x-small text-muted fw-800">
+                                            <span><i class="fas fa-users me-2 opacity-50"></i>Gr. {{ s.groupe }}</span>
+                                            <span><i class="fas fa-door-open me-2 opacity-50"></i>{{ s.salle.nom if s.salle else 'N/A' }}</span>
+                                            {% if s.module.formation %}<span><i class="fas fa-graduation-cap me-2 opacity-50"></i>{{ s.module.formation.nom }}</span>{% endif %}
+                                        </div>
+                                    </div>
+                                    <div class="text-end">
+                                        <div class="fw-800 text-primary small">{{ s.duree }}h</div>
+                                    </div>
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                        </div>
+                    {% endif %}
+                {% endfor %}
+                </div>
+                {% endif %}
+            {% endif %}
         </div>
-      {% endfor %}
-    {% endif %}
-  </div>
-</div>
-
-{# ── CHARGE PAR MODULE ──────────────────────────────────────── #}
-<div class="col-lg-5">
-  <div class="glass-card animate-fade-in" style="animation-delay:.15s">
-    <h5 class="fw-bold mb-4"><i class="fas fa-chart-bar me-2"></i>Charge par module</h5>
-
-    {% if not module_stats %}
-    <div class="empty-state">
-      <i class="fas fa-book-open d-block text-muted"></i>
-      <p class="text-muted small mt-2 mb-0">Aucune affectation trouvée.</p>
     </div>
-    {% else %}
-      {% for ms in module_stats %}
-      <div class="mod-row">
-        <div class="d-flex justify-content-between align-items-start mb-1">
-          <div>
-            <span class="fw-semibold" style="font-size:.9rem">{{ ms.module.libelle }}</span>
-            <span class="badge bg-secondary ms-2" style="font-size:.65rem">{{ ms.module.formation.nom if ms.module.formation else '' }}</span>
-          </div>
-          <div class="text-end ms-2 flex-shrink-0">
-            <span class="fw-bold {% if ms.h_sup > 0 %}text-danger{% elif ms.reste == 0 %}text-success{% endif %}" style="font-size:.85rem">
-              {{ ms.fait }}h / {{ ms.quota }}h
-            </span>
-          </div>
+
+    {# ── CHARGE PAR MODULE ──────────────────────────────────────── #}
+    <div class="col-lg-5">
+        <div class="data-card border-0 shadow-lg animate-fade-in p-4" style="animation-delay:.15s">
+            <h5 class="fw-800 mb-4 text-dark"><i class="fas fa-chart-bar me-2 text-accent opacity-50"></i> Charge par module</h5>
+
+            {% if not module_stats %}
+            <div class="text-center py-5">
+                <div class="bg-light text-muted rounded-circle mx-auto mb-3 d-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
+                    <i class="fas fa-book-open opacity-25"></i>
+                </div>
+                <p class="text-muted small">Aucune affectation trouvée.</p>
+            </div>
+            {% else %}
+                {% for ms in module_stats %}
+                <div class="bg-light p-4 rounded-3 mb-3 border-0">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <div class="pe-3">
+                            <div class="fw-800 text-dark small mb-1">{{ ms.module.libelle }}</div>
+                            <span class="badge bg-primary-light text-primary" style="font-size:.6rem; font-weight: 800;">{{ ms.module.formation.nom if ms.module.formation else '' }}</span>
+                        </div>
+                        <div class="text-end">
+                            <div class="fw-800 {% if ms.h_sup > 0 %}text-danger{% elif ms.reste == 0 %}text-success{% else %}text-primary{% endif %}" style="font-size:1rem">
+                                {{ ms.fait }}h <span class="text-muted fw-600" style="font-size: 0.7rem;">/ {{ ms.quota }}h</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="progress shadow-none border-0 mb-3" style="height: 6px; background: #e2e8f0;">
+                        <div class="progress-bar {% if ms.h_sup > 0 %}bg-danger{% else %}bg-primary{% endif %} rounded-pill" style="width:{{ ms.percent if ms.percent <= 100 else 100 }}%"></div>
+                    </div>
+                    
+                    <div class="d-flex flex-wrap gap-2 x-small text-muted fw-800">
+                        <div class="bg-white px-2 py-1 rounded border shadow-xs" title="CM">CM {{ ms.cm_fait }}/{{ ms.cm_quota }}h</div>
+                        <div class="bg-white px-2 py-1 rounded border shadow-xs" title="TD">TD {{ ms.td_fait }}/{{ ms.td_quota }}h</div>
+                        <div class="bg-white px-2 py-1 rounded border shadow-xs" title="TP">TP {{ ms.tp_fait }}/{{ ms.tp_quota }}h</div>
+                        
+                        <div class="ms-auto pt-1">
+                            {% if ms.h_sup > 0 %}
+                            <span class="text-danger"><i class="fas fa-exclamation-triangle me-1"></i>+{{ ms.h_sup }}h sup</span>
+                            {% elif ms.reste > 0 %}
+                            <span class="text-primary">{{ ms.reste }}h restantes</span>
+                            {% else %}
+                            <span class="text-success"><i class="fas fa-check-circle me-1"></i>Complet</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            {% endif %}
         </div>
-        <div class="prog-bar">
-          <div class="prog-fill {% if ms.h_sup > 0 %}over{% endif %}" style="width:{{ ms.percent }}%"></div>
-        </div>
-        <div class="d-flex gap-3 mt-2" style="font-size:.7rem;color:#94a3b8">
-          <span><i class="fas fa-chalkboard me-1 text-primary-subtle"></i>CM {{ ms.cm_fait }}/{{ ms.cm_quota }}h</span>
-          <span><i class="fas fa-users me-1 text-success-subtle"></i>TD {{ ms.td_fait }}/{{ ms.td_quota }}h</span>
-          <span><i class="fas fa-laptop me-1 text-warning-subtle"></i>TP {{ ms.tp_fait }}/{{ ms.tp_quota }}h</span>
-          {% if ms.h_sup > 0 %}
-          <span class="ms-auto text-danger fw-bold">+{{ ms.h_sup }}h sup</span>
-          {% elif ms.reste > 0 %}
-          <span class="ms-auto">{{ ms.reste }}h restantes</span>
-          {% else %}
-          <span class="ms-auto text-success">✓ Complet</span>
-          {% endif %}
-        </div>
-      </div>
-      {% endfor %}
-    {% endif %}
-  </div>
+    </div>
 </div>
 
-</div><!-- /row -->
+<style>
+.btn-white { background: white; color: var(--text-secondary); border: 1px solid var(--border); }
+.btn-white:hover { background: var(--bg-body); color: var(--primary); }
+.shadow-xs { shadow: 0 1px 2px rgba(0,0,0,0.05); }
+</style>
 {% endblock %}

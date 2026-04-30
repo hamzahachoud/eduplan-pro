@@ -1,34 +1,69 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="row justify-content-center">
-    <div class="col-md-5">
-        <div class="glass-card mt-5 animate-fade-in">
-            <div class="text-center mb-4">
-                <i class="fas fa-user-shield fa-3x text-primary mb-3"></i>
-                <h2 class="fw-bold">Connexion Admin</h2>
-                <p class="text-muted">Accès réservé aux responsables de formation</p>
+<div class="row justify-content-center align-items-center" style="min-height: 80vh;">
+    <div class="col-md-5 col-lg-4">
+        <div class="data-card animate-slide-up shadow-xl p-4 p-md-5 border-0">
+            <div class="text-center mb-5">
+                <div class="bg-primary-light text-primary mx-auto mb-4 d-flex align-items-center justify-content-center shadow-sm" style="width: 80px; height: 80px; border-radius: 24px;">
+                    <i class="fas fa-user-shield fa-2x"></i>
+                </div>
+                <h2 class="fw-800 text-dark mb-2">Espace Admin</h2>
+                <p class="text-muted small px-3">Authentifiez-vous pour gérer les ressources et la planification.</p>
             </div>
             
             <form method="POST" action="">
                 {{ form.hidden_tag() }}
-                <div class="mb-3">
-                    <label class="form-label text-muted small">Email Académique</label>
-                    {{ form.email(class="form-control", placeholder="admin@univ.fr") }}
-                    {% for error in form.email.errors %}
-                        <span class="text-danger small">{{ error }}</span>
-                    {% endfor %}
-                </div>
                 <div class="mb-4">
-                    <label class="form-label text-muted small">Mot de passe</label>
-                    {{ form.password(class="form-control", placeholder="••••••••") }}
-                    {% for error in form.password.errors %}
-                        <span class="text-danger small">{{ error }}</span>
+                    <label class="form-label">Email Professionnel</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-light border-end-0 text-muted px-3"><i class="fas fa-envelope"></i></span>
+                        {{ form.email(class="form-control bg-light border-start-0 ps-0", placeholder="admin@univ.fr") }}
+                    </div>
+                    {% for error in form.email.errors %}
+                        <div class="text-danger x-small mt-2 fw-600"><i class="fas fa-exclamation-circle me-1"></i> {{ error }}</div>
                     {% endfor %}
                 </div>
-                {{ form.submit(class="btn btn-primary w-100 py-3") }}
+                
+                <div class="mb-4">
+                    <label class="form-label">Mot de passe</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-light border-end-0 text-muted px-3"><i class="fas fa-lock"></i></span>
+                        {{ form.password(class="form-control bg-light border-start-0 ps-0", placeholder="••••••••") }}
+                    </div>
+                    {% for error in form.password.errors %}
+                        <div class="text-danger x-small mt-2 fw-600"><i class="fas fa-exclamation-circle me-1"></i> {{ error }}</div>
+                    {% endfor %}
+                </div>
+                
+                <div class="mb-4 d-flex justify-content-between align-items-center">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="remember">
+                        <label class="form-check-label small text-muted" for="remember">Se souvenir de moi</label>
+                    </div>
+                </div>
+                
+                <button type="submit" class="btn btn-primary w-100 py-3 fw-bold shadow-sm">
+                    Connexion <i class="fas fa-sign-in-alt ms-2"></i>
+                </button>
             </form>
+            
+            <div class="mt-5 text-center pt-4 border-top">
+                <a href="{{ url_for('student.index') }}" class="text-muted text-decoration-none small fw-600 hover-primary">
+                    <i class="fas fa-arrow-left me-2"></i>Retour à l'accueil
+                </a>
+            </div>
         </div>
+        
+        <p class="text-center mt-4 text-muted x-small opacity-75">
+            Accès sécurisé réservé au personnel autorisé de l'Université.<br>
+            &copy; 2024 EduPlan Pro
+        </p>
     </div>
 </div>
+
+<style>
+.input-group-text { border: 1px solid var(--border); }
+.form-control:focus + .input-group-text { border-color: var(--primary); }
+</style>
 {% endblock %}

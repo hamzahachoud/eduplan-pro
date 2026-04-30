@@ -1,6 +1,9 @@
 from flask import Flask
 from app.config import Config
 from app.extensions import db, migrate, login_manager
+from flask_wtf.csrf import CSRFProtect
+
+csrf = CSRFProtect()
 
 def create_app(config_class=Config):
     """
@@ -14,6 +17,7 @@ def create_app(config_class=Config):
     db.init_app(app)
     migrate.init_app(app, db)
     login_manager.init_app(app)
+    csrf.init_app(app)
 
     # Configuration du user loader pour Flask-Login
     from app.models import User
@@ -33,5 +37,15 @@ def create_app(config_class=Config):
 
     # Configuration Globale Jinja2
     app.jinja_env.globals.update(chr=chr)
+
+    @app.context_processor
+    def inject_notifications():
+        from flask_login import current_user
+        from app.models import Notification
+        if current_user.is_authenticated:
+            notifs = Notification.query.filter_by(user_id=current_user.id, is_read=False).order_by(Notification.created_at.desc()).limit(5).all()
+            count = Notification.query.filter_by(user_id=current_user.id, is_read=False).count()
+            return dict(unread_notifications=notifs, unread_count=count)
+        return dict(unread_notifications=[], unread_count=0)
 
     return app

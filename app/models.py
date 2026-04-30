@@ -153,9 +153,21 @@ class Seance(db.Model):
     
     @property
     def heure_fin(self):
-        """Calcul automatique de l'heure de fin basé sur le début et la durée."""
-        # Combinaison avec une date factice pour faciliter le calcul
-        dt = datetime.combine(self.date_seance, self.heure_debut)
-        # Ajout de la durée
-        dt_fin = dt + timedelta(hours=self.duree)
-        return dt_fin.time()
+        """Calcule l'heure de fin en fonction de l'heure de début et de la durée."""
+        start_dt = datetime.combine(datetime.today(), self.heure_debut)
+        end_dt = start_dt + timedelta(hours=self.duree)
+        return end_dt.time()
+
+class Notification(db.Model):
+    """
+    Modèle Notification pour les alertes internes.
+    """
+    __tablename__ = 'notifications'
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    message = db.Column(db.Text, nullable=False)
+    type = db.Column(db.String(20), default='info') # 'info', 'warning', 'success', 'danger'
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    is_read = db.Column(db.Boolean, default=False)
+    
+    user = db.relationship('User', backref=db.backref('notifications', lazy='dynamic', cascade='all, delete-orphan'))

@@ -2,90 +2,168 @@
 
 {% block content %}
 <div class="row">
+    <!-- Ajouter un Module -->
     <div class="col-lg-4 mb-4">
-        <div class="glass-card animate-fade-in">
-            <h5 class="fw-bold mb-4"><i class="fas fa-book-medical me-2"></i> Ajouter au Programme</h5>
+        <div class="data-card border-0 shadow-lg animate-fade-in sticky-top" style="top: 100px;">
+            <div class="d-flex align-items-center mb-4">
+                <div class="bg-primary text-white rounded-3 p-2 me-3" style="width: 40px; height: 40px; display: inline-flex; align-items: center; justify-content: center;">
+                    <i class="fas fa-book-medical"></i>
+                </div>
+                <h5 class="fw-800 m-0">Nouveau Module</h5>
+            </div>
+            
             <form method="POST" action="">
                 {{ form.hidden_tag() }}
                 <div class="mb-3">
-                    <label class="form-label text-muted small">Code Module</label>
-                    {{ form.code(class="form-control", placeholder="ex: M2103") }}
+                    <label class="form-label">Code Module</label>
+                    {{ form.code(class="form-control shadow-none", placeholder="ex: M2103") }}
                 </div>
                 <div class="mb-3">
-                    <label class="form-label text-muted small">Libellé</label>
-                    {{ form.libelle(class="form-control", placeholder="ex: Bases de données") }}
+                    <label class="form-label">Libellé complet</label>
+                    {{ form.libelle(class="form-control shadow-none", placeholder="ex: Bases de données") }}
                 </div>
-                <div class="mb-3">
-                    <label class="form-label text-muted small">Catégorie (ex: Info, Anglais)</label>
-                    {{ form.categorie(class="form-control") }}
-                </div>
-                <div class="mb-3">
-                    <label class="form-label text-muted small">Formation</label>
-                    {{ form.formation_id(class="form-select") }}
-                </div>
-                <div class="row">
-                    <div class="col-4 mb-3">
-                        <label class="form-label text-muted small">h CM</label>
-                        {{ form.cm_heures(class="form-control") }}
+                <div class="row g-2">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Catégorie</label>
+                        {{ form.categorie(class="form-control shadow-none", placeholder="ex: Info") }}
                     </div>
-                    <div class="col-4 mb-3">
-                        <label class="form-label text-muted small">h TD/gp</label>
-                        {{ form.td_heures(class="form-control") }}
-                    </div>
-                    <div class="col-4 mb-3">
-                        <label class="form-label text-muted small">h TP/gp</label>
-                        {{ form.tp_heures(class="form-control") }}
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Formation</label>
+                        {{ form.formation_id(class="form-select shadow-none") }}
                     </div>
                 </div>
-                {{ form.submit(class="btn btn-primary w-100 mt-3") }}
+                <div class="row g-2">
+                    <div class="col-4 mb-3">
+                        <label class="form-label text-center d-block">CM</label>
+                        {{ form.cm_heures(class="form-control shadow-none text-center") }}
+                    </div>
+                    <div class="col-4 mb-3">
+                        <label class="form-label text-center d-block">TD/gp</label>
+                        {{ form.td_heures(class="form-control shadow-none text-center") }}
+                    </div>
+                    <div class="col-4 mb-3">
+                        <label class="form-label text-center d-block">TP/gp</label>
+                        {{ form.tp_heures(class="form-control shadow-none text-center") }}
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary w-100 mt-2 py-3 shadow-sm">
+                    <i class="fas fa-plus-circle me-2"></i> Créer le module
+                </button>
             </form>
         </div>
     </div>
     
     <div class="col-lg-8">
-        <div class="glass-card animate-fade-in" style="animation-delay: 0.2s;">
-            <h5 class="fw-bold mb-4"><i class="fas fa-stream me-2"></i> Maquette Pédagogique</h5>
-            <div class="table-responsive">
-                <table class="table">
-                    <thead>
+        <!-- BARRE DE RECHERCHE & FILTRES -->
+        <div class="data-card mb-4 border-0 shadow-sm animate-fade-in" style="animation-delay: 0.1s;">
+            <form method="GET" action="{{ url_for('admin.modules') }}" class="row g-3 align-items-end">
+                <div class="col-md-4">
+                    <div class="input-group input-group-sm">
+                        <span class="input-group-text bg-light border-end-0 text-muted"><i class="fas fa-search"></i></span>
+                        <input type="text" name="q" class="form-control border-start-0 ps-0 shadow-none" placeholder="Rechercher un module..." value="{{ request.args.get('q', '') }}">
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <select name="formation_id" class="form-select form-select-sm shadow-none">
+                        <option value="">Toutes les formations</option>
+                        {% for f in formations %}
+                        <option value="{{ f.id }}" {% if request.args.get('formation_id')|string == f.id|string %}selected{% endif %}>{{ f.nom }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <select name="categorie" class="form-select form-select-sm shadow-none">
+                        <option value="">Catégories</option>
+                        {% for c in categories %}
+                        <option value="{{ c }}" {% if request.args.get('categorie') == c %}selected{% endif %}>{{ c }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <select name="sort" class="form-select form-select-sm shadow-none">
+                        <option value="code" {% if request.args.get('sort') == 'code' %}selected{% endif %}>Trier par Code</option>
+                        <option value="formation" {% if request.args.get('sort') == 'formation' %}selected{% endif %}>Trier par Formation</option>
+                    </select>
+                </div>
+                <div class="col-md-1">
+                    <button type="submit" class="btn btn-primary btn-sm w-100 py-1 shadow-sm"><i class="fas fa-filter"></i></button>
+                </div>
+            </form>
+        </div>
+
+        <div class="data-card border-0 shadow-lg animate-fade-in p-4" style="animation-delay: 0.2s;">
+            <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
+                <h5 class="fw-800 m-0"><i class="fas fa-stream me-2 text-primary opacity-50"></i> Maquette Pédagogique</h5>
+                <div class="d-flex gap-2">
+                    <button type="button" class="btn btn-sm btn-white px-3 shadow-sm" data-bs-toggle="modal" data-bs-target="#importModal">
+                        <i class="fas fa-upload text-primary me-2"></i>Importer
+                    </button>
+                    <a href="{{ url_for('admin.export_csv', type_export='modules', fid=request.args.get('formation')) }}" class="btn btn-sm btn-white px-3 shadow-sm">
+                        <i class="fas fa-file-csv text-success me-2"></i>Exporter
+                    </a>
+                </div>
+            </div>
+            
+            <div class="table-responsive border-0">
+                <table class="table table-hover align-middle">
+                    <thead class="bg-light">
                         <tr>
-                            <th>Module</th>
+                            <th class="ps-4">Module</th>
                             <th>Formation</th>
-                            <th>CM</th>
-                            <th>TD</th>
-                            <th>TP</th>
-                            <th>Catégorie</th>
-                            <th>Total</th>
-                            <th>Actions</th>
+                            <th>Répartition Horaires</th>
+                            <th class="text-center">Total</th>
+                            <th class="text-end pe-4">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for module in modules %}
                         <tr>
-                            <td>
-                                <div class="fw-bold">{{ module.code }}</div>
-                                <div class="small text-muted">{{ module.libelle }}</div>
+                            <td class="ps-4">
+                                <div class="fw-800 text-dark">{{ module.code }}</div>
+                                <div class="x-small text-muted fw-600">{{ module.libelle|truncate(40) }}</div>
                             </td>
-                            <td><span class="badge bg-secondary">{{ module.formation.nom }}</span></td>
-                            <td><span class="badge badge-custom badge-cm">{{ module.cm_heures }}h</span></td>
-                            <td><span class="badge badge-custom badge-td">{{ module.td_heures }}h</span></td>
-                            <td><span class="badge badge-custom badge-tp">{{ module.tp_heures }}h</span></td>
-                            <td>{{ module.categorie or '-' }}</td>
-                            <td class="fw-bold">{{ module.volume_total }}h</td>
+                            <td><span class="badge bg-primary-light text-primary fw-800">{{ module.formation.nom }}</span></td>
                             <td>
                                 <div class="d-flex gap-2">
-                                    <a href="{{ url_for('admin.edit_module', id=module.id) }}" class="btn btn-sm btn-outline-info" title="Modifier">
-                                        <i class="fas fa-edit"></i>
+                                    <div class="text-center" style="min-width: 35px;">
+                                        <div class="x-small fw-800 text-info">CM</div>
+                                        <div class="badge badge-cm px-2">{{ module.cm_heures }}h</div>
+                                    </div>
+                                    <div class="text-center" style="min-width: 35px;">
+                                        <div class="x-small fw-800 text-success">TD</div>
+                                        <div class="badge badge-td px-2">{{ module.td_heures }}h</div>
+                                    </div>
+                                    <div class="text-center" style="min-width: 35px;">
+                                        <div class="x-small fw-800 text-warning">TP</div>
+                                        <div class="badge badge-tp px-2">{{ module.tp_heures }}h</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="text-center">
+                                <span class="fw-800 text-dark">{{ module.volume_total }}h</span>
+                            </td>
+                            <td class="text-end pe-4">
+                                <div class="btn-group shadow-sm rounded-pill overflow-hidden border">
+                                    <a href="{{ url_for('admin.edit_module', id=module.id) }}" class="btn btn-white btn-sm px-3" title="Modifier">
+                                        <i class="fas fa-edit text-primary"></i>
                                     </a>
-                                    <a href="{{ url_for('admin.delete_module', id=module.id) }}" class="btn btn-sm btn-outline-danger" title="Supprimer" onclick="return confirm('Supprimer ce module ?');">
-                                        <i class="fas fa-trash"></i>
-                                    </a>
+                                    <form method="POST" action="{{ url_for('admin.delete_module', id=module.id) }}" class="d-inline" onsubmit="return confirm('Supprimer ce module ?');">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                        <button type="submit" class="btn btn-white btn-sm px-3" title="Supprimer">
+                                            <i class="fas fa-trash text-danger"></i>
+                                        </button>
+                                    </form>
                                 </div>
                             </td>
                         </tr>
                         {% else %}
                         <tr>
-                            <td colspan="6" class="text-center text-muted">Aucun module configuré.</td>
+                            <td colspan="5" class="py-5 text-center">
+                                <div class="bg-light rounded-circle mx-auto mb-3 d-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
+                                    <i class="fas fa-book-open opacity-25 fa-2x"></i>
+                                </div>
+                                <p class="text-muted small">Aucun module ne correspond à votre recherche.</p>
+                            </td>
                         </tr>
                         {% endfor %}
                     </tbody>
@@ -93,5 +171,47 @@
             </div>
         </div>
     </div>
+</div>
+
+<style>
+.btn-white { background: white; color: var(--text-secondary); border: 1px solid var(--border); }
+.btn-white:hover { background: var(--bg-body); color: var(--primary); }
+</style>
+{% endblock %}
+
+{% block modals %}
+<div class="modal fade" id="importModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content data-card border-0 shadow-xl p-0 overflow-hidden">
+      <div class="bg-primary p-4 text-white">
+        <h5 class="modal-title fw-800 m-0"><i class="fas fa-upload me-2"></i> Importer des Modules</h5>
+        <p class="x-small opacity-75 mb-0 mt-1">Mise à jour rapide de la maquette pédagogique</p>
+      </div>
+      <div class="modal-body p-4">
+        <div class="bg-light p-3 rounded-3 mb-4">
+            <h6 class="fw-800 x-small text-uppercase mb-2 text-muted">Format attendu (CSV)</h6>
+            <code class="x-small">code; libelle; categorie; formation; cm_heures; td_heures; tp_heures</code>
+        </div>
+        
+        <form action="{{ url_for('admin.import_csv', type_import='modules') }}" method="POST" enctype="multipart/form-data">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <div class="mb-4">
+                <label class="form-label">Fichier source</label>
+                <input class="form-control shadow-none" type="file" name="file" accept=".csv" required>
+            </div>
+            
+            <div class="d-flex align-items-center justify-content-between pt-3 border-top">
+                <a href="{{ url_for('admin.import_template', type_import='modules') }}" class="text-primary x-small fw-800 text-decoration-none hover-lift">
+                    <i class="fas fa-download me-1"></i> Télécharger le modèle
+                </a>
+                <div class="d-flex gap-2">
+                    <button type="button" class="btn btn-secondary px-3" data-bs-toggle="modal">Annuler</button>
+                    <button type="submit" class="btn btn-primary px-4 shadow-sm">Lancer l'import</button>
+                </div>
+            </div>
+        </form>
+      </div>
+    </div>
+  </div>
 </div>
 {% endblock %}

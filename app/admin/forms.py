@@ -63,6 +63,7 @@ class SeanceForm(FlaskForm):
     heure_debut = TimeField('Heure de début', validators=[DataRequired()])
     duree = FloatField('Durée (en heures)', validators=[DataRequired(), NumberRange(min=0.5)], default=1.5)
     salle_id = SelectField('Salle', coerce=int, validators=[DataRequired()])
+    nb_semaines = IntegerField('Répéter (semaines)', default=1, validators=[NumberRange(min=1, max=15)])
     submit = SubmitField('Planifier')
 
     def __init__(self, *args, **kwargs):

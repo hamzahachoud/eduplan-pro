@@ -3,71 +3,143 @@
 {% block content %}
 <div class="row">
     <div class="col-lg-4 mb-4">
-        <div class="glass-card animate-fade-in">
-            <h5 class="fw-bold mb-4"><i class="fas fa-plus-circle me-2"></i> Nouvelle Salle</h5>
+        <div class="data-card border-0 shadow-lg animate-fade-in sticky-top" style="top: 100px;">
+            <div class="d-flex align-items-center mb-4">
+                <div class="bg-primary text-white rounded-3 p-2 me-3" style="width: 40px; height: 40px; display: inline-flex; align-items: center; justify-content: center;">
+                    <i class="fas fa-plus-circle"></i>
+                </div>
+                <h5 class="fw-800 m-0">Nouvelle Salle</h5>
+            </div>
+            
             <form method="POST" action="">
                 {{ form.hidden_tag() }}
-                <div class="mb-3">
-                    <label class="form-label text-muted small">Type de salle</label>
-                    {{ form.type_salle(class="form-select", id="type_salle_select") }}
+                <div class="mb-4">
+                    <label class="form-label">Type de salle</label>
+                    {{ form.type_salle(class="form-select shadow-none border-2", id="type_salle_select") }}
                 </div>
-                <div id="nom_field" class="mb-3">
-                    <label class="form-label text-muted small">Nom de la salle (Amphi)</label>
-                    {{ form.nom(class="form-control", placeholder="ex: Amphi A") }}
+                
+                <div id="nom_field" class="mb-4">
+                    <label class="form-label">Nom de l'Amphi</label>
+                    {{ form.nom(class="form-control shadow-none", placeholder="ex: Amphi A") }}
                 </div>
+                
                 <div id="bulk_fields" style="display: none;">
-                    <div class="mb-3">
-                        <label class="form-label text-muted small">Nombre de salles</label>
-                        {{ form.nombre(class="form-control") }}
+                    <div class="mb-4">
+                        <label class="form-label">Nombre de salles à créer</label>
+                        {{ form.nombre(class="form-control shadow-none", placeholder="ex: 5") }}
                     </div>
-                    <div id="cat_field" class="mb-3" style="display: none;">
-                        <label class="form-label text-muted small">Catégorie (ex: Info, Anglais)</label>
-                        {{ form.categorie(class="form-control") }}
+                    <div id="cat_field" class="mb-4" style="display: none;">
+                        <label class="form-label">Catégorie technique</label>
+                        {{ form.categorie(class="form-control shadow-none", placeholder="ex: Info, Anglais...") }}
                     </div>
                 </div>
-                <div class="mb-3">
-                    <label class="form-label text-muted small">Capacité par salle</label>
-                    {{ form.capacite(class="form-control") }}
+                
+                <div class="mb-4">
+                    <label class="form-label">Capacité (places)</label>
+                    {{ form.capacite(class="form-control shadow-none", placeholder="ex: 30") }}
                 </div>
-                {{ form.submit(class="btn btn-primary w-100 mt-3") }}
+                
+                <button type="submit" class="btn btn-primary w-100 mt-2 py-3 shadow-sm">
+                    <i class="fas fa-save me-2"></i> Enregistrer les salles
+                </button>
             </form>
         </div>
     </div>
     
     <div class="col-lg-8">
-        <div class="glass-card animate-fade-in" style="animation-delay: 0.2s;">
-            <h5 class="fw-bold mb-4"><i class="fas fa-door-open me-2"></i> Salles Existantes</h5>
-            <div class="table-responsive">
-                <table class="table">
-                    <thead>
+        <!-- BARRE DE RECHERCHE -->
+        <div class="data-card mb-4 border-0 shadow-sm animate-fade-in" style="animation-delay: 0.1s;">
+            <form method="GET" action="{{ url_for('admin.salles') }}" class="row g-3 align-items-end">
+                <div class="col-md-3">
+                    <div class="input-group input-group-sm">
+                        <span class="input-group-text bg-light border-end-0 text-muted"><i class="fas fa-search"></i></span>
+                        <input type="text" name="q" class="form-control border-start-0 ps-0 shadow-none" placeholder="Nom..." value="{{ request.args.get('q', '') }}">
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <select name="type_salle" class="form-select form-select-sm shadow-none">
+                        <option value="">Tous les types</option>
+                        <option value="Amphi" {% if request.args.get('type_salle') == 'Amphi' %}selected{% endif %}>Amphi</option>
+                        <option value="TD" {% if request.args.get('type_salle') == 'TD' %}selected{% endif %}>TD</option>
+                        <option value="TP" {% if request.args.get('type_salle') == 'TP' %}selected{% endif %}>TP</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <select name="categorie" class="form-select form-select-sm shadow-none">
+                        <option value="">Catégories</option>
+                        {% for c in categories %}
+                        <option value="{{ c }}" {% if request.args.get('categorie') == c %}selected{% endif %}>{{ c }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <input type="number" name="min_cap" class="form-control form-control-sm shadow-none" placeholder="Cap. Min" value="{{ request.args.get('min_cap', '') }}">
+                </div>
+                <div class="col-md-1">
+                    <button type="submit" class="btn btn-primary btn-sm w-100 py-1 shadow-sm"><i class="fas fa-filter"></i></button>
+                </div>
+            </form>
+        </div>
+
+        <div class="data-card border-0 shadow-lg animate-fade-in p-4" style="animation-delay: 0.2s;">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h5 class="fw-800 m-0"><i class="fas fa-door-open me-2 text-primary opacity-50"></i> Ressources Immobilières</h5>
+                <div class="d-flex gap-2 align-items-center">
+                    <span class="badge bg-primary-light text-primary fw-800 px-3 me-2">{{ salles|length }} Salles</span>
+                    <a href="{{ url_for('admin.export_csv', type_export='salles') }}" class="btn btn-sm btn-white px-3 shadow-sm" title="Export CSV">
+                        <i class="fas fa-file-csv text-success me-2"></i>Export
+                    </a>
+                    <button type="button" class="btn btn-sm btn-white px-3 shadow-sm" data-bs-toggle="modal" data-bs-target="#importModal">
+                        <i class="fas fa-upload text-info me-2"></i>Import
+                    </button>
+                </div>
+            </div>
+            
+            <div class="table-responsive border-0">
+                <table class="table table-hover align-middle">
+                    <thead class="bg-light">
                         <tr>
-                            <th>Nom</th>
+                            <th class="ps-4">Salle / Nom</th>
                             <th>Type</th>
-                            <th>Catégorie</th>
-                            <th>Capacité</th>
-                            <th>Action</th>
+                            <th>Spécialisation</th>
+                            <th class="text-center">Capacité</th>
+                            <th class="text-end pe-4">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for salle in salles %}
                         <tr>
-                            <td class="fw-bold text-primary">{{ salle.nom }}</td>
+                            <td class="ps-4">
+                                <div class="fw-800 text-dark">{{ salle.nom }}</div>
+                            </td>
                             <td>
-                                <span class="badge {% if salle.type_salle == 'Amphi' %}bg-info{% elif salle.type_salle == 'TD' %}bg-success{% else %}bg-warning{% endif %}">
+                                <span class="badge {% if salle.type_salle == 'Amphi' %}bg-primary{% elif salle.type_salle == 'TD' %}bg-success{% else %}bg-warning text-dark{% endif %} px-3">
                                     {{ salle.type_salle }}
                                 </span>
                             </td>
-                            <td>{{ salle.categorie or '-' }}</td>
-                            <td>{{ salle.capacite or 'N/A' }}</td>
                             <td>
-                                <a href="{{ url_for('admin.delete_salle', id=salle.id) }}" class="btn btn-sm btn-outline-danger" onclick="return confirm('Supprimer cette salle ?')">
-                                    <i class="fas fa-trash"></i>
-                                </a>
+                                <span class="text-muted fw-600 x-small">{{ salle.categorie or 'Standard' }}</span>
+                            </td>
+                            <td class="text-center">
+                                <div class="fw-800 text-dark">{{ salle.capacite or '?' }} <span class="x-small text-muted fw-400">places</span></div>
+                            </td>
+                            <td class="text-end pe-4">
+                                <form method="POST" action="{{ url_for('admin.delete_salle', id=salle.id) }}" style="display: inline;" onsubmit="return confirm('Supprimer cette salle ?');">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                    <button type="submit" class="btn btn-white btn-sm rounded-circle shadow-sm" style="width: 32px; height: 32px; padding:0;" title="Supprimer">
+                                        <i class="fas fa-trash-alt text-danger x-small"></i>
+                                    </button>
+                                </form>
                             </td>
                         </tr>
                         {% else %}
                         <tr>
-                            <td colspan="5" class="text-center text-muted">Aucune salle créée.</td>
+                            <td colspan="5" class="py-5 text-center">
+                                <div class="bg-light rounded-circle mx-auto mb-3 d-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
+                                    <i class="fas fa-door-closed opacity-25 fa-2x"></i>
+                                </div>
+                                <p class="text-muted small">Aucune salle ne correspond à vos critères.</p>
+                            </td>
                         </tr>
                         {% endfor %}
                     </tbody>
@@ -76,6 +148,11 @@
         </div>
     </div>
 </div>
+
+<style>
+.btn-white { background: white; color: var(--text-secondary); border: 1px solid var(--border); }
+.btn-white:hover { background: var(--bg-body); color: var(--primary); }
+</style>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
@@ -92,11 +169,7 @@ document.addEventListener('DOMContentLoaded', function() {
         } else {
             nomField.style.display = 'none';
             bulkFields.style.display = 'block';
-            if (val === 'TP') {
-                catField.style.display = 'block';
-            } else {
-                catField.style.display = 'none';
-            }
+            catField.style.display = (val === 'TP') ? 'block' : 'none';
         }
     }
 
@@ -104,4 +177,41 @@ document.addEventListener('DOMContentLoaded', function() {
     toggleFields();
 });
 </script>
+{% endblock %}
+
+{% block modals %}
+<div class="modal fade" id="importModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content data-card border-0 shadow-xl p-0 overflow-hidden">
+      <div class="bg-primary p-4 text-white">
+        <h5 class="modal-title fw-800 m-0"><i class="fas fa-upload me-2"></i> Importer des Salles</h5>
+        <p class="x-small opacity-75 mb-0 mt-1">Intégration massive des ressources immobilières</p>
+      </div>
+      <div class="modal-body p-4">
+        <div class="bg-light p-3 rounded-3 mb-4">
+            <h6 class="fw-800 x-small text-uppercase mb-2 text-muted">Structure CSV attendue</h6>
+            <code class="x-small">nom; type_salle; categorie; capacite</code>
+        </div>
+        
+        <form action="{{ url_for('admin.import_csv', type_import='salles') }}" method="POST" enctype="multipart/form-data">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <div class="mb-4">
+                <label class="form-label">Fichier CSV (UTF-8)</label>
+                <input class="form-control shadow-none" type="file" name="file" accept=".csv" required>
+            </div>
+            
+            <div class="d-flex align-items-center justify-content-between pt-3 border-top">
+                <a href="{{ url_for('admin.import_template', type_import='salles') }}" class="text-primary x-small fw-800 text-decoration-none hover-lift">
+                    <i class="fas fa-download me-1"></i> Télécharger le modèle
+                </a>
+                <div class="d-flex gap-2">
+                    <button type="button" class="btn btn-secondary px-3" data-bs-dismiss="modal">Annuler</button>
+                    <button type="submit" class="btn btn-primary px-4 shadow-sm">Lancer l'import</button>
+                </div>
+            </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
 {% endblock %}
